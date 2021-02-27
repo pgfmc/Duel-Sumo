@@ -17,8 +17,8 @@ public class CommandDuel implements CommandExecutor{
         	Player P = (Player) sender;
         //	//Player player = (Player) sender;
         	
-        	
-        	if ((label == "duel") || (label == "PGFduels.duelStart") || (label == "duelStart")) { // ----------- checks to see which alias was used
+        	P.sendMessage("Something worked: Label: " + label);
+        	if ((label.equals("duel")) || (label.equals("PGFduels.duelStart")) || (label.equals("duelStart"))) { // ----------- checks to see which alias was used
         		if (args.length != 0) { // --------------------------------------------------------------------- checks to see how many arguments were input.
         			Player duelee = Bukkit.getPlayer(args[0]); 
         			if (duelee != P) {//------------------------------------------------------------------- checks to see if the sender = target
@@ -35,7 +35,7 @@ public class CommandDuel implements CommandExecutor{
         		} else { // ------------------------------------------------------------------------------------- if no arguments are input, then types this message below: V
         				(P).sendRawMessage("Type the player you want to duel!");// sent to the sender
         		}
-        	} else if (label == "duelaccept" || (label == "da")) { // if they type the duelaccept command V
+        	} else if (label.equals("duelaccept") || (label.equals("da"))) { // if they type the duelaccept command V
         		Set<String> gamerMoment = P.getScoreboardTags();
         		for (String microMoment : gamerMoment) {  // ------ looks for the -Request suffix to the tag they probably have
         			if (microMoment.contains("-Request")) {
