@@ -8,3 +8,5 @@ commands:
     description: Begins a duel
     usage: /duel
     permission: Duels.duelStart
+    aliases: [duel]
+      

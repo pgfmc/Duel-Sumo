@@ -13,7 +13,7 @@ import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.inventory.ItemStack;
 
-
+// old sumo code below V will be deleted soon : )
 
 public class PlayerEvents implements Listener {
 
