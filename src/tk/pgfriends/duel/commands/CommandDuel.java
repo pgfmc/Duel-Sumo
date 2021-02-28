@@ -1,12 +1,20 @@
 package tk.pgfriends.duel.commands;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.PlayerInventory;
+
 
 public class CommandDuel implements CommandExecutor{
 	
@@ -27,8 +35,19 @@ public class CommandDuel implements CommandExecutor{
         				((Player) duelee).sendRawMessage("Type the command /duelaccept or /da to accept!");
         				((Player) duelee).sendRawMessage("This request will expire in 60 seconds.");
         				
-        				duelee.addScoreboardTag(sender.getName() + "-Request"); // gives target the scoreboard tag when they are sent a request
+        				duelee.addScoreboardTag(P.getName() + "-Request"); // gives target the scoreboard tag when they are sent a request
         				P.addScoreboardTag(duelee.getName() + "-Send"); // gives sender the scoreboard tag when they send a request
+        				
+        				try {
+							TimeUnit.MINUTES.sleep(1); // --- waits 1 minute, then removes the tags if they aren't already removed. --! Ends the accepting time. !--
+						} catch (InterruptedException e) {
+							if (P.getScoreboardTags().contains(duelee.getName() + "-Send") && duelee.getScoreboardTags().contains(P.getName() + "-Request")) {
+								duelee.removeScoreboardTag(P.getName() + "-Request");
+								P.removeScoreboardTag(duelee.getName() + "-Send");
+								
+							}
+						}
+						
         			} else { // else
         				(P).sendRawMessage("You can't Duel yourself!");// sent to the sender
         			}
@@ -44,6 +63,33 @@ public class CommandDuel implements CommandExecutor{
         				pSender.sendRawMessage("Prepare for a FIGHT!");
         				P.sendRawMessage("You have accepted the duel!");
         				P.sendRawMessage("Prepare for a FIGHT!");
+        				
+        				HashMap<String, PlayerInventory> saveData = new HashMap<String, PlayerInventory>(); // adds player inventories to the Hashmap for saving
+        				saveData.put(P.getName(), P.getInventory());
+        				saveData.put(pSender.getName(), pSender.getInventory());
+        				
+        				
+        				// -- INSERT SAVE DATA CODE HERE -- //
+        				
+        				
+        				P.addScoreboardTag("inBattle"); // --- adds tags that allow only the other person to attack them
+        				pSender.addScoreboardTag("inBattle");
+        				
+        				
+        				
+        				ArrayList<ItemStack> basicLoadout = new ArrayList<ItemStack>();
+        				basicLoadout.set(0, new ItemStack(Material.IRON_SWORD, 1));
+        				basicLoadout.set(1, new ItemStack(Material.IRON_AXE, 1));
+        				basicLoadout.set(36, new ItemStack(Material.IRON_BOOTS, 1));
+        				basicLoadout.set(37, new ItemStack(Material.IRON_LEGGINGS, 1));
+        				basicLoadout.set(38, new ItemStack(Material.IRON_CHESTPLATE, 1));
+        				basicLoadout.set(39, new ItemStack(Material.IRON_HELMET, 1));
+        				basicLoadout.set(40, new ItemStack(Material.SHIELD, 1));
+        				
+        				Iterator<ItemStack> BL = basicLoadout.iterator();
+        				
+        			} else {
+        				P.sendRawMessage("No one has sent you a Deul Request!");
         			}
         		}
         		if ((P).getScoreboardTags().contains("ableToDash")) {
