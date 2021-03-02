@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 //import java.util.Iterator;
 import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 import org.bukkit.Bukkit;
@@ -19,6 +20,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 
 import tk.pgfriends.duel.Main;
+import tk.pgfriends.duel.SaveData;
 
 
 
@@ -40,7 +42,7 @@ public class CommandDuel implements CommandExecutor{
         			Player duelee = Bukkit.getPlayer(args[0]); 
         			if (duelee != P) {//------------------------------------------------------------------- checks to see if the sender = target
         				(P).sendRawMessage("Duel Request sent! Request will expire in 60 seconds."); //  sent to the sender
-        				((Player) duelee).sendRawMessage(sender.getName() + " has sent you a Duel Request!"); // message sent to the target
+        				((Player) duelee).sendRawMessage(P.getName() + " has sent you a Duel Request!"); // message sent to the target
         				((Player) duelee).sendRawMessage("Type the command /duelaccept or /da to accept!");
         				((Player) duelee).sendRawMessage("This request will expire in 60 seconds.");
         				
@@ -51,8 +53,8 @@ public class CommandDuel implements CommandExecutor{
 							TimeUnit.MINUTES.sleep(1); // --- waits 1 minute, then removes the tags if they aren't already removed. --! Ends the accepting time. !--
 						} catch (InterruptedException e) {
 							if (P.getScoreboardTags().contains(duelee.getName() + "-Send") && duelee.getScoreboardTags().contains(P.getName() + "-Request")) {
-								duelee.removeScoreboardTag(P.getName() + "-Request");
-								P.removeScoreboardTag(duelee.getName() + "-Send");
+								duelee.removeScoreboardTag(P.getUniqueId() + "-Request");
+								P.removeScoreboardTag(duelee.getUniqueId() + "-Send");
 								
 							}
 						}
@@ -73,9 +75,9 @@ public class CommandDuel implements CommandExecutor{
         				P.sendRawMessage("You have accepted the duel!");
         				P.sendRawMessage("Prepare for a FIGHT!");
         				
-        				HashMap<String, PlayerInventory> saveData = new HashMap<String, PlayerInventory>(); // adds player inventories to the Hashmap for saving
-        				saveData.put(P.getName(), P.getInventory());
-        				saveData.put(pSender.getName(), pSender.getInventory());
+        				HashMap<UUID, PlayerInventory> saveData = new HashMap<UUID, PlayerInventory>(); // adds player inventories to the Hashmap for saving
+        				saveData.put(P.getUniqueId(), P.getInventory());
+        				saveData.put(pSender.getUniqueId(), pSender.getInventory());
         				
         				
         				// -- INSERT SAVE DATA CODE HERE -- //
@@ -97,7 +99,8 @@ public class CommandDuel implements CommandExecutor{
         				
         				//Iterator<ItemStack> BL = basicLoadout.iterator();
         				
-        				Main.save(saveData, database, file);
+        				SaveData.save(P.getUniqueId(), P.getInventory());
+        				SaveData.save(pSender.getUniqueId(), pSender.getInventory());
         				
         			} else {
         				P.sendRawMessage("No one has sent you a Deul Request!");

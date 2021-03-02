@@ -2,11 +2,9 @@ package tk.pgfriends.duel;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
 
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import tk.pgfriends.duel.commands.CommandDuel;
@@ -59,18 +57,6 @@ public class Main extends JavaPlugin {
 
 		} catch (IOException e) {
 			e.printStackTrace(); // Doesn't crash plugin if the above fails
-		}
-	}
-	
-	public static void save(HashMap<String, PlayerInventory> gameing, FileConfiguration database, File file) // Saves the data to the file when called
-	{
-		database.set("gmeing", gameing);
-		
-		try {
-			database.save(file);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		}
 	}
 }
