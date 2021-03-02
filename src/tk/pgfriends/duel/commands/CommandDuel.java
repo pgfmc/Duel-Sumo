@@ -1,6 +1,5 @@
 package tk.pgfriends.duel.commands;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 //import java.util.Iterator;
@@ -13,21 +12,16 @@ import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
-import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 
-import tk.pgfriends.duel.Main;
 import tk.pgfriends.duel.SaveData;
 
 
 
 public class CommandDuel implements CommandExecutor{
 	
-	File file = new File(Main.plugin.getDataFolder() + File.separator + "database.yml"); // Creates a File object
-	FileConfiguration database = YamlConfiguration.loadConfiguration(file); // Turns the File object into YAML and loads data
 	
 	
 	@Override
