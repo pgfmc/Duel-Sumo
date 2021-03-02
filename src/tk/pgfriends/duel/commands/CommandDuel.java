@@ -5,7 +5,6 @@ import java.util.HashMap;
 //import java.util.Iterator;
 import java.util.Set;
 import java.util.UUID;
-import java.util.concurrent.TimeUnit;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -16,6 +15,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 
+import tk.pgfriends.duel.Main;
 import tk.pgfriends.duel.SaveData;
 
 
@@ -43,15 +43,19 @@ public class CommandDuel implements CommandExecutor{
         				duelee.addScoreboardTag(P.getName() + "-Request"); // gives target the scoreboard tag when they are sent a request
         				P.addScoreboardTag(duelee.getName() + "-Send"); // gives sender the scoreboard tag when they send a request
         				
-        				try {
-							TimeUnit.MINUTES.sleep(1); // --- waits 1 minute, then removes the tags if they aren't already removed. --! Ends the accepting time. !--
-						} catch (InterruptedException e) {
+        				Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(Main.plugin, new Runnable() {
+        	                
+        	                @Override
+        	                public void run()
+        	                {
 							if (P.getScoreboardTags().contains(duelee.getName() + "-Send") && duelee.getScoreboardTags().contains(P.getName() + "-Request")) {
 								duelee.removeScoreboardTag(P.getUniqueId() + "-Request");
 								P.removeScoreboardTag(duelee.getUniqueId() + "-Send");
 								
 							}
-						}
+        	                }
+        	                
+        	            }, 20 * 10);
 						
         			} else { // else
         				(P).sendRawMessage("You can't Duel yourself!");// sent to the sender

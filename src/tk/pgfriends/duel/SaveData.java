@@ -23,10 +23,10 @@ public class SaveData {
 		
 		
 		
-		int recursion = 0;
+		int recursion = 0; // adds each inventory slot to the string
 		String bigChungaloid = "";
 		for (ItemStack item : PI.getContents()) {
-			bigChungaloid.concat(String.valueOf(recursion) + " : " + item.serialize().toString());
+			bigChungaloid.concat(String.valueOf(recursion) + " : " + item.serialize().toString() + "%n");
 		}
 		
 		
@@ -41,17 +41,5 @@ public class SaveData {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
-		
 	}
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
 }
