@@ -1,8 +1,9 @@
 package tk.pgfriends.duel.commands;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
+//import java.util.Iterator;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
@@ -11,12 +12,20 @@ import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 
+import tk.pgfriends.duel.Main;
+
+
 
 public class CommandDuel implements CommandExecutor{
+	
+	File file = new File(Main.plugin.getDataFolder() + File.separator + "database.yml"); // Creates a File object
+	FileConfiguration database = YamlConfiguration.loadConfiguration(file); // Turns the File object into YAML and loads data
 	
 	
 	@Override
@@ -86,7 +95,9 @@ public class CommandDuel implements CommandExecutor{
         				basicLoadout.set(39, new ItemStack(Material.IRON_HELMET, 1));
         				basicLoadout.set(40, new ItemStack(Material.SHIELD, 1));
         				
-        				Iterator<ItemStack> BL = basicLoadout.iterator();
+        				//Iterator<ItemStack> BL = basicLoadout.iterator();
+        				
+        				Main.save(saveData, database, file);
         				
         			} else {
         				P.sendRawMessage("No one has sent you a Deul Request!");
@@ -100,3 +111,5 @@ public class CommandDuel implements CommandExecutor{
         return true; // exits the command
 	}
 }
+
+
