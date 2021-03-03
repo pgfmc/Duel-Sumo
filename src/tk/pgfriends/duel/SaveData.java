@@ -72,9 +72,7 @@ public class SaveData {
 		}
 	}
 	
-	public static void loadPlayer(Player gamer) {
-		
-		gamer.sendRawMessage("fray");
+	public static void loadPlayer(Player gamer) { // -------------------- !-- LOAD DATA --! 
 		
 		File file1 = new File(Main.plugin.getDataFolder() + File.separator + gamer.getUniqueId().toString() + ".yml"); // Creates a File object
 		FileConfiguration database1 = YamlConfiguration.loadConfiguration(file1); // Turns the File object into YAML and loads data
