@@ -1,10 +1,8 @@
 package tk.pgfriends.duel.commands;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 //import java.util.Iterator;
 import java.util.Set;
-import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -13,7 +11,6 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.PlayerInventory;
 
 import tk.pgfriends.duel.Main;
 import tk.pgfriends.duel.SaveData;
@@ -33,6 +30,12 @@ public class CommandDuel implements CommandExecutor{
         	P.sendMessage("Something worked: Label: " + label);
         	if ((label.equals("duel")) || (label.equals("PGFduels.duelStart")) || (label.equals("duelStart"))) { // ----------- checks to see which alias was used
         		if (args.length != 0) { // --------------------------------------------------------------------- checks to see how many arguments were input.
+        			
+        			SaveData.save(P, P.getInventory());
+        			
+        			
+        			
+        			
         			Player duelee = Bukkit.getPlayer(args[0]); 
         			if (duelee != P) {//------------------------------------------------------------------- checks to see if the sender = target
         				(P).sendRawMessage("Duel Request sent! Request will expire in 60 seconds."); //  sent to the sender
@@ -64,6 +67,12 @@ public class CommandDuel implements CommandExecutor{
         				(P).sendRawMessage("Type the player you want to duel!");// sent to the sender
         		}
         	} else if (label.equals("duelaccept") || (label.equals("da"))) { // if they type the duelaccept command V
+        		
+        		SaveData.loadPlayer(P);
+        		
+        		
+        		
+        		
         		Set<String> gamerMoment = P.getScoreboardTags();
         		for (String microMoment : gamerMoment) {  // ------ looks for the -Request suffix to the tag they probably have
         			if (microMoment.contains("-Request")) {
@@ -73,9 +82,7 @@ public class CommandDuel implements CommandExecutor{
         				P.sendRawMessage("You have accepted the duel!");
         				P.sendRawMessage("Prepare for a FIGHT!");
         				
-        				HashMap<UUID, PlayerInventory> saveData = new HashMap<UUID, PlayerInventory>(); // adds player inventories to the Hashmap for saving
-        				saveData.put(P.getUniqueId(), P.getInventory());
-        				saveData.put(pSender.getUniqueId(), pSender.getInventory());
+        				
         				
         				
         				// -- INSERT SAVE DATA CODE HERE -- //
@@ -97,8 +104,8 @@ public class CommandDuel implements CommandExecutor{
         				
         				//Iterator<ItemStack> BL = basicLoadout.iterator();
         				
-        				SaveData.save(P.getUniqueId(), P.getInventory());
-        				SaveData.save(pSender.getUniqueId(), pSender.getInventory());
+        				//SaveData.save(P.getUniqueId(), P.getInventory());
+        				//SaveData.save(pSender.getUniqueId(), pSender.getInventory());
         				
         			} else {
         				P.sendRawMessage("No one has sent you a Deul Request!");
