@@ -1,16 +1,13 @@
 package tk.pgfriends.duel.commands;
 
-import java.util.ArrayList;
 //import java.util.Iterator;
 import java.util.Set;
 
 import org.bukkit.Bukkit;
-import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 
 import tk.pgfriends.duel.Main;
 import tk.pgfriends.duel.SaveData;
@@ -31,11 +28,6 @@ public class CommandDuel implements CommandExecutor{
         	if ((label.equals("duel")) || (label.equals("PGFduels.duelStart")) || (label.equals("duelStart"))) { // ----------- checks to see which alias was used
         		if (args.length != 0) { // --------------------------------------------------------------------- checks to see how many arguments were input.
         			
-        			SaveData.save(P, P.getInventory());
-        			
-        			
-        			
-        			
         			Player duelee = Bukkit.getPlayer(args[0]); 
         			if (duelee != P) {//------------------------------------------------------------------- checks to see if the sender = target
         				(P).sendRawMessage("Duel Request sent! Request will expire in 60 seconds."); //  sent to the sender
@@ -51,11 +43,11 @@ public class CommandDuel implements CommandExecutor{
         	                @Override
         	                public void run()
         	                {
-							if (P.getScoreboardTags().contains(duelee.getName() + "-Send") && duelee.getScoreboardTags().contains(P.getName() + "-Request")) {
-								duelee.removeScoreboardTag(P.getUniqueId() + "-Request");
-								P.removeScoreboardTag(duelee.getUniqueId() + "-Send");
+        	                	if (P.getScoreboardTags().contains(duelee.getName() + "-Send") && duelee.getScoreboardTags().contains(P.getName() + "-Request")) {
+        	                		duelee.removeScoreboardTag(P.getUniqueId() + "-Request");
+        	                		P.removeScoreboardTag(duelee.getUniqueId() + "-Send");
 								
-							}
+        	                	}
         	                }
         	                
         	            }, 20 * 10);
@@ -68,51 +60,84 @@ public class CommandDuel implements CommandExecutor{
         		}
         	} else if (label.equals("duelaccept") || (label.equals("da"))) { // if they type the duelaccept command V
         		
-        		SaveData.loadPlayer(P);
-        		
-        		
-        		
+	
         		
         		Set<String> gamerMoment = P.getScoreboardTags();
         		for (String microMoment : gamerMoment) {  // ------ looks for the -Request suffix to the tag they probably have
         			if (microMoment.contains("-Request")) {
         				Player pSender = Bukkit.getPlayer(microMoment.replace("-Request", "")); // ------- sends the messages to everybody involved
+        				P.removeScoreboardTag(pSender.getUniqueId() + "-Request");
+        				pSender.removeScoreboardTag(P.getUniqueId() + "-Send");
+        				
+        				SaveData.save(P, P.getInventory());
+        				SaveData.save(pSender, pSender.getInventory());
+        				
+        				
         				pSender.sendRawMessage(sender.getName() + " has accepted your duel request!");
         				pSender.sendRawMessage("Prepare for a FIGHT!");
         				P.sendRawMessage("You have accepted the duel!");
         				P.sendRawMessage("Prepare for a FIGHT!");
         				
         				
-        				
-        				
-        				// -- INSERT SAVE DATA CODE HERE -- //
-        				
-        				
-        				P.addScoreboardTag("inBattle"); // --- adds tags that allow only the other person to attack them
-        				pSender.addScoreboardTag("inBattle");
+        				// onscreen animations and countdown
         				
         				
         				
-        				ArrayList<ItemStack> basicLoadout = new ArrayList<ItemStack>();
-        				basicLoadout.set(0, new ItemStack(Material.IRON_SWORD, 1));
-        				basicLoadout.set(1, new ItemStack(Material.IRON_AXE, 1));
-        				basicLoadout.set(36, new ItemStack(Material.IRON_BOOTS, 1));
-        				basicLoadout.set(37, new ItemStack(Material.IRON_LEGGINGS, 1));
-        				basicLoadout.set(38, new ItemStack(Material.IRON_CHESTPLATE, 1));
-        				basicLoadout.set(39, new ItemStack(Material.IRON_HELMET, 1));
-        				basicLoadout.set(40, new ItemStack(Material.SHIELD, 1));
         				
-        				//Iterator<ItemStack> BL = basicLoadout.iterator();
         				
-        				//SaveData.save(P.getUniqueId(), P.getInventory());
-        				//SaveData.save(pSender.getUniqueId(), pSender.getInventory());
+        				
+        				
+        				P.sendTitle("3", "", 2, 16, 2);
+        				Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(Main.plugin, new Runnable() {
+        					@Override
+        					public void run() {
+        						P.sendTitle("2", "", 2, 16, 2);
+        						Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(Main.plugin, new Runnable() {
+                					@Override
+                					public void run() {
+                						P.sendTitle("1", "", 2, 16, 2);
+                						Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(Main.plugin, new Runnable() {
+                        					@Override
+                        					public void run() {
+                        						P.sendTitle("G O !", "", 0, 3, 0);
+                        						Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(Main.plugin, new Runnable() {
+                                					@Override
+                                					public void run() {
+                                						P.sendTitle("G O !", "", 0, 3, 0);
+                                						Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(Main.plugin, new Runnable() {
+                                        					@Override
+                                        					public void run() {
+                                        						P.sendTitle("GO!", "", 0, 20, 4);
+                                        					}
+                                        				}, 2);
+                                					}
+                                				}, 2);
+                        					}
+                        				}, 2);
+                					}
+                				}, 20);
+        					}
+        				}, 20);
+        				
+        				
+        				
+        				
+        				
+        				
+        				
+        				
+        				
+        				
+        				
+        				P.addScoreboardTag("inBattle-" + pSender.getUniqueId()); // --- adds tags that allow only the other person to attack them
+        				pSender.addScoreboardTag("inBattle-" + P.getUniqueId());
+        				
+        				
+        				break;
         				
         			} else {
         				P.sendRawMessage("No one has sent you a Deul Request!");
         			}
-        		}
-        		if ((P).getScoreboardTags().contains("ableToDash")) {
-        			
         		}
         	}
         }
