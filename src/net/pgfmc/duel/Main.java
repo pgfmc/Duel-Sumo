@@ -1,11 +1,11 @@
-package tk.pgfriends.duel;
+package net.pgfmc.duel;
 
 //import java.io.IOException;
 
 import org.bukkit.plugin.java.JavaPlugin;
 
-import tk.pgfriends.duel.commands.CommandDuel;
-import tk.pgfriends.duel.events.PlayerEvents;
+import net.pgfmc.duel.commands.CommandDuel;
+import net.pgfmc.duel.events.PlayerEvents;
 
 public class Main extends JavaPlugin {
 	
@@ -25,7 +25,7 @@ public class Main extends JavaPlugin {
 		
 		plugin = this;
 		
-		
+
 		
 		
 	}

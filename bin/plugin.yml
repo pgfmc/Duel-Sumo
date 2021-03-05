@@ -1,8 +1,8 @@
-name: PGFduels
-version: alpha 1.2.1
+name: PGFduel
+version: beta 1.0.0
 api-version: 1.16
 author: CrimsonDart
-main: tk.pgfriends.duel.Main
+main: net.pgfmc.duel.Main
 commands:
   duelStart:
     description: Begins a duel

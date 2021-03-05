@@ -1,4 +1,4 @@
-package tk.pgfriends.duel;
+package net.pgfmc.duel;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -75,6 +75,43 @@ public class SaveData {
 	public static void loadPlayer(Player gamer) { // -------------------- !-- LOAD DATA --! 
 		
 		File file1 = new File(Main.plugin.getDataFolder() + File.separator + gamer.getUniqueId().toString() + ".yml"); // Creates a File object
+		FileConfiguration database1 = YamlConfiguration.loadConfiguration(file1); // Turns the File object into YAML and loads data
+		
+		if (file1.exists()) {
+			try {
+				database1.load(file1); // loads file (duh)
+				
+				
+				int recursion = 0;
+				PlayerInventory PI = gamer.getInventory();
+				
+				for (@SuppressWarnings("unused") ItemStack item : PI.getContents()) { // begin FOR loop
+					
+					
+					
+					ItemStack e = (ItemStack) database1.get(String.valueOf(recursion));
+					gamer.getInventory().setItem(recursion, e); // sets the item to that ItemStack
+					
+					
+					recursion += 1; // next index
+				
+				}
+				
+			} catch (FileNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (InvalidConfigurationException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+	}
+	public static void loadout(Player gamer) { // -------------------- !-- LOAD DATA --! 
+		
+		File file1 = new File(Main.plugin.getDataFolder() + File.separator + "loadout.yml"); // Creates a File object
 		FileConfiguration database1 = YamlConfiguration.loadConfiguration(file1); // Turns the File object into YAML and loads data
 		
 		if (file1.exists()) {
