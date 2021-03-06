@@ -5,6 +5,8 @@ package net.pgfmc.duel;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import net.pgfmc.duel.commands.CommandDuel;
+import net.pgfmc.duel.commands.CommandGetLosses;
+import net.pgfmc.duel.commands.CommandGetWins;
 import net.pgfmc.duel.events.PlayerEvents;
 
 public class Main extends JavaPlugin {
@@ -18,24 +20,15 @@ public class Main extends JavaPlugin {
 	
 	
 	public void onEnable() {
-		this.getCommand("duelStart").setExecutor(new CommandDuel()); // /duel command load
+		this.getCommand("duelStart").setExecutor(new CommandDuel()); // command loading
+		
+		this.getCommand("scoreOfWins").setExecutor(new CommandGetWins());
+		
+		this.getCommand("scoreOfWins").setExecutor(new CommandGetLosses());
 		
 		getServer().getPluginManager().registerEvents(new PlayerEvents(), this); // loads PlayerEvents.java
 		
 		
 		plugin = this;
-		
-
-		
-		
 	}
-	
-	//@Override
-	//public void onDisable() // When the plugin is disabled
-	//{
-		// database.set("blockBroken.playerData." + uuid, pLoc.get(uuid).toString());
-		
-		
-		
-	//}
 }

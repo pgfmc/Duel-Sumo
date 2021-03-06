@@ -111,8 +111,6 @@ public class CommandDuel implements CommandExecutor{
         				SaveData.loadout(pSender);
         				
         				
-        				
-        				
         				P.sendTitle("3", "", 2, 16, 2); // ------------------------------------------------------- onscreen animations and countdown
         				Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(Main.plugin, new Runnable() {
         					@Override
@@ -162,20 +160,7 @@ public class CommandDuel implements CommandExecutor{
         	    				}, 20);
         					}
         				}, 20);
-        				
-        				
-        				
-        				
-        				
-        				
-        				
-        				
-        				
-        				
-        				
-        				
-        				
-        				
+
         				break;
         				
         			} else {
