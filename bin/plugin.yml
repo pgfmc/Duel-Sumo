@@ -1,14 +1,14 @@
 name: PGFduel
-version: beta 1.1.0
+version: beta 1.2.0
 api-version: 1.16
 author: CrimsonDart
 main: net.pgfmc.duel.Main
 commands:
-  duelStart:
-    description: Begins a duel
-    usage: /duel
-    permission: Duels.duelStart
-    aliases: [duel, duelaccept, da]
+  #duelStart:
+    #description: Begins a duel
+    #usage: /duel
+    #permission: Duels.duelStart
+    #aliases: [duel, duelaccept, da]
   scoreOfWins:
     description: Gets the amount of wins of all players on the server
     usage: /scoreOfWins

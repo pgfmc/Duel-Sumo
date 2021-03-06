@@ -18,15 +18,12 @@ import net.pgfmc.duel.SaveData;
 public class CommandDuel implements CommandExecutor{
 	
 	
-	
+	@Deprecated
 	@Override
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) { // command setup for /duel and /duelaccept
         if (sender instanceof Player) {
         	Player P = (Player) sender;
-        
-        	
 
-   
         	if ((label.equals("duel")) || (label.equals("PGFduels.duelStart")) || (label.equals("duelStart"))) { // ----------- checks to see which alias was used
         		if (args.length != 0) { // --------------------------------------------------------------------- checks to see how many arguments were input.
         			
@@ -64,16 +61,7 @@ public class CommandDuel implements CommandExecutor{
         		} else { // ------------------------------------------------------------------------------------- if no arguments are input, then types this message below: V
         				(P).sendRawMessage("Type the player you want to duel!");// sent to the sender
         		}
-        		
-        		
-        		
-        		
-        		
-        		
-        		
-        		
-        		
-        		
+
         	} else if (label.equals("duelaccept") || (label.equals("da"))) { // if they type the duelaccept command V
         		
 	
@@ -83,34 +71,27 @@ public class CommandDuel implements CommandExecutor{
         			if (microMoment.contains("-Request")) {
         				
         				UUID plaer = UUID.fromString(microMoment.replace("-Request", ""));
-        				
-        				
-        				
+
         				Player pSender = Bukkit.getPlayer(plaer); // ------- sends the messages to everybody involved
         				pSender.removeScoreboardTag(P.getUniqueId() + "-Request");
         				P.removeScoreboardTag(pSender.getUniqueId() + "-Send");
-        				
-        				
-        				
-        				
-        				pSender.sendRawMessage(sender.getName() + " has accepted your duel request!");
+
+        				pSender.sendRawMessage(P.getName() + " has accepted your duel request!");
         				P.sendRawMessage("You have accepted the duel!");
         				Bukkit.broadcastMessage(pSender.getDisplayName() + " and " + P.getDisplayName() + " are starting a duel!!");
-        				
-        				
+
         				P.setHealth(20.0);
         				pSender.setHealth(20.0);
-        				P.setSaturation(200);
-        				pSender.setSaturation(200);
+        				P.setSaturation(10);
+        				pSender.setSaturation(10);
         				
         				// saves inventory, then replaces it with the duel inventory.
         				
-        				SaveData.save(P, P.getInventory());
-        				SaveData.save(pSender, pSender.getInventory());
+        				SaveData.save(P);
+        				SaveData.save(pSender);
         				SaveData.loadout(P);
         				SaveData.loadout(pSender);
-        				
-        				
+
         				P.sendTitle("3", "", 2, 16, 2); // ------------------------------------------------------- onscreen animations and countdown
         				Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(Main.plugin, new Runnable() {
         					@Override
@@ -144,8 +125,7 @@ public class CommandDuel implements CommandExecutor{
         	                                            					@Override
         	                                            					public void run() {
         	                                            						P.sendTitle("GO!", "", 0, 20, 4);
-        	                                            						
-        	                                            						
+
         	                                            					}
         	                                            				}, 2);
         	                                    					}

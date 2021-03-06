@@ -4,7 +4,6 @@ package net.pgfmc.duel;
 
 import org.bukkit.plugin.java.JavaPlugin;
 
-import net.pgfmc.duel.commands.CommandDuel;
 import net.pgfmc.duel.commands.CommandGetLosses;
 import net.pgfmc.duel.commands.CommandGetWins;
 import net.pgfmc.duel.events.PlayerEvents;
@@ -20,7 +19,7 @@ public class Main extends JavaPlugin {
 	
 	
 	public void onEnable() {
-		this.getCommand("duelStart").setExecutor(new CommandDuel()); // command loading
+		//this.getCommand("duelStart").setExecutor(new CommandDuel()); // command loading
 		
 		this.getCommand("scoreOfWins").setExecutor(new CommandGetWins());
 		

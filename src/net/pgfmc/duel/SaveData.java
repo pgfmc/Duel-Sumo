@@ -18,12 +18,12 @@ public class SaveData {
 	
 	
 	
-	public static void save(Player uuid, PlayerInventory PI) {
+	public static void save(Player uuid) {
 		
 		File file1 = new File(Main.plugin.getDataFolder() + File.separator + uuid.getUniqueId().toString() + ".yml"); // Creates a File object
 		FileConfiguration database1 = YamlConfiguration.loadConfiguration(file1); // Turns the File object into YAML and loads data
 		
-		
+		PlayerInventory PI = uuid.getInventory();
 		
 		if (!file1.exists()) // If the file doesn't exist, create one
 		{
@@ -112,6 +112,7 @@ public class SaveData {
 			}
 		}
 	}
+	
 	public static void loadout(Player gamer) { // -------------------- !-- LOAD DATA --! 
 		
 		File file1 = new File(Main.plugin.getDataFolder() + File.separator + "loadout.yml"); // Creates a File object
@@ -178,6 +179,7 @@ public class SaveData {
 			}
 		}
 	}
+	
 	public static void getScore(Player sender, boolean wins) { // -------------------- !-- LOAD DATA --! 
 		
 		File file1 = new File(Main.plugin.getDataFolder() + File.separator + "database.yml"); // Creates a File object
