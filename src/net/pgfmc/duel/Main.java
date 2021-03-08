@@ -23,7 +23,7 @@ public class Main extends JavaPlugin {
 		
 		this.getCommand("scoreOfWins").setExecutor(new CommandGetWins());
 		
-		this.getCommand("scoreOfWins").setExecutor(new CommandGetLosses());
+		this.getCommand("scoreOfLosses").setExecutor(new CommandGetLosses());
 		
 		getServer().getPluginManager().registerEvents(new PlayerEvents(), this); // loads PlayerEvents.java
 		
