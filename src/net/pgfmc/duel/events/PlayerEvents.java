@@ -92,6 +92,9 @@ public class PlayerEvents implements Listener {
 		
 		target.removeScoreboardTag(attacker.getUniqueId() + "-Request");
 		attacker.removeScoreboardTag(target.getUniqueId() + "-Send");
+		
+		attacker.addScoreboardTag("inBattle-"); // --- adds tags that allow only the other person to attack them
+		target.addScoreboardTag("inBattle-");
 
 		attacker.sendTitle("3", "", 2, 16, 2); // ------------------------------------------------------- onscreen animations and countdown
 		target.sendTitle("3", "", 2, 16, 2);
@@ -112,7 +115,8 @@ public class PlayerEvents implements Listener {
         						target.sendTitle("D    U    E    L    !", "", 0, 20, 4);
         						
         						
-        						
+        						target.removeScoreboardTag("inBattle-");
+        						attacker.removeScoreboardTag("inBattle-");
         						
         						attacker.addScoreboardTag("inBattle-" + target.getUniqueId()); // --- adds tags that allow only the other person to attack them
         						target.addScoreboardTag("inBattle-" + attacker.getUniqueId());
