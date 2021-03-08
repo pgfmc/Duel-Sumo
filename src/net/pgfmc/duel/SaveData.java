@@ -177,6 +177,13 @@ public class SaveData {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+			
+			try {
+				database1.save(file1); // Tries to save file
+
+			} catch (IOException e) {
+				e.printStackTrace(); // Doesn't crash plugin if the above fails
+			}
 		}
 	}
 	
@@ -223,6 +230,8 @@ public class SaveData {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+			
+			
 		}
 	}
 }

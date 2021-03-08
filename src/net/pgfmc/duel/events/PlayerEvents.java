@@ -89,6 +89,9 @@ public class PlayerEvents implements Listener {
 		SaveData.save(target);
 		SaveData.loadout(attacker);
 		SaveData.loadout(target);
+		
+		target.removeScoreboardTag(attacker.getUniqueId() + "-Request");
+		attacker.removeScoreboardTag(target.getUniqueId() + "-Send");
 
 		attacker.sendTitle("3", "", 2, 16, 2); // ------------------------------------------------------- onscreen animations and countdown
 		target.sendTitle("3", "", 2, 16, 2);
@@ -110,8 +113,7 @@ public class PlayerEvents implements Listener {
         						
         						
         						
-        						target.removeScoreboardTag(attacker.getUniqueId() + "-Request");
-        						attacker.removeScoreboardTag(target.getUniqueId() + "-Send");
+        						
         						attacker.addScoreboardTag("inBattle-" + target.getUniqueId()); // --- adds tags that allow only the other person to attack them
         						target.addScoreboardTag("inBattle-" + attacker.getUniqueId());
                 				
@@ -164,20 +166,24 @@ public class PlayerEvents implements Listener {
 					e.setDamage(0);
 					endDuel(target, attacker);
 				}
+				
+				
 			// if not in a battle, and target doesnt have 
 			} else if (!target.getScoreboardTags().contains("inBattle-") || !attacker.getScoreboardTags().contains("inBattle-") && (attacker.getInventory().getItemInMainHand().getType() == Material.IRON_SWORD || attacker.getInventory().getItemInMainHand().getType() == Material.DIAMOND_SWORD || attacker.getInventory().getItemInMainHand().getType() == Material.GOLDEN_SWORD || attacker.getInventory().getItemInMainHand().getType() == Material.STONE_SWORD || attacker.getInventory().getItemInMainHand().getType() == Material.NETHERITE_SWORD || attacker.getInventory().getItemInMainHand().getType() == Material.WOODEN_SWORD)) { // if someone is not in a duel:
+				
 				e.setCancelled(true);
+				
 				Bukkit.broadcastMessage("not in battle");
 				if (!attacker.getScoreboardTags().contains(target.getUniqueId() + "-Send") && !target.getScoreboardTags().contains(attacker.getUniqueId() + "-Request")) {
 					if (attacker.getScoreboardTags().contains("timeout")) {
 						attacker.sendMessage("You need to wait 10 seconds before you can duel again.");
-					} else if (target.addScoreboardTag("timeout")) {
+					} else if (target.getScoreboardTags().contains("timeout")) {
 						attacker.sendMessage("You can't duel them, they just got out of a duel!");
 					} else {
 						duelRequest(target, attacker);
 					}
 				// if not above function 
-				} else {
+				} else if (attacker.getScoreboardTags().contains(target.getUniqueId() + "-Request") && target.getScoreboardTags().contains(attacker.getUniqueId() + "-Send")){
 					duelAccept(target, attacker);
 				}
 			} 
