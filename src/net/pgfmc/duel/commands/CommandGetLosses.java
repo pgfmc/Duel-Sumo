@@ -16,6 +16,6 @@ public class CommandGetLosses implements CommandExecutor {
 
 		SaveData.getScore(player, false);
 
-		return false;
+		return true;
 	}
 }

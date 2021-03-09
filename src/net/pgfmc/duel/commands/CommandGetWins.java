@@ -16,6 +16,6 @@ public class CommandGetWins implements CommandExecutor {
 
 		SaveData.getScore(player, true); // umm yeah
 
-		return false;
+		return true;
 	}
 }
