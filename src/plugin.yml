@@ -1,5 +1,5 @@
 name: PGFduel
-version: beta 1.3.0
+version: beta 1.4.0
 api-version: 1.16
 author: CrimsonDart
 main: net.pgfmc.duel.Main
@@ -13,10 +13,10 @@ commands:
   scoreOfWins:
     description: Gets the amount of wins of all players on the server
     usage: /scoreOfWins
-    permission: Duels.getWins
+    permission: Duels.scoreOfWins
     aliases: [SOW, Wins, duelWs]
   scoreOfLosses:
     description: Gets the amount of losses of all players on the server
     usage: /scoreOfLosses
-    permission: Duels.getLoss
+    permission: Duels.scoreOfLosses
     aliases: [SOL, Losses, duelLs]

@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -173,7 +174,7 @@ public class SaveData {
 		}
 	}
 	
-	public static void Scoreboard(Player gamer, boolean increase) { // -------------------- !-- LOAD DATA --! 
+	public static void Scoreboard(OfflinePlayer gamer, boolean increase) { // -------------------- !-- LOAD DATA --! 
 		
 		if (!file1.exists()) // If the file doesn't exist, create one
 		{
