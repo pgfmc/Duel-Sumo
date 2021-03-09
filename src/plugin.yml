@@ -1,8 +1,9 @@
 name: PGFduel
-version: beta 1.2.0
+version: beta 1.3.0
 api-version: 1.16
 author: CrimsonDart
 main: net.pgfmc.duel.Main
+description: implements the duel system into PGF
 commands:
   #duelStart:
     #description: Begins a duel

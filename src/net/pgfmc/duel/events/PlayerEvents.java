@@ -1,6 +1,6 @@
 package net.pgfmc.duel.events;
 
-import java.util.Set;
+import java.util.Map;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
@@ -15,32 +15,38 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import net.pgfmc.duel.Main;
 import net.pgfmc.duel.SaveData;
 
+
+
+
+
+
 // old sumo code below V will be deleted soon : )
 
 public class PlayerEvents implements Listener {
 	
+	Map<Player, String> playerState;
 	
 	public void endDuel(Player target, Player attacker) { // ends the duel, and restores health
 		
 		target.setHealth(20.0);
 		attacker.setHealth(20.0);
 		Bukkit.broadcastMessage(attacker.getDisplayName() + " won the Duel!!");
-		attacker.removeScoreboardTag("inBattle-" + target.getUniqueId());
-		target.removeScoreboardTag("inBattle-" + attacker.getUniqueId());
+		
+		playerState.put(attacker, "timeout");
+		playerState.put(target, "timeout");
+		
 		SaveData.loadPlayer(attacker);
 		SaveData.loadPlayer(target);
 		SaveData.Scoreboard(attacker, true);
 		SaveData.Scoreboard(target, false);
-		attacker.addScoreboardTag("timeout");
-		target.addScoreboardTag("timeout");
 		
 		Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(Main.plugin, new Runnable() {
             
             @Override
             public void run()
             {
-            	attacker.removeScoreboardTag("timeout");
-        		target.removeScoreboardTag("timeout");
+            	playerState.put(attacker, "");
+        		playerState.put(target, "");
             }
             
         }, 20 * 10);
@@ -73,28 +79,24 @@ public class PlayerEvents implements Listener {
 	
 	public void duelAccept(Player target, Player attacker) { // Duel Acceptor
 		
-
 		target.sendRawMessage(attacker.getName() + " has accepted your Challenge to Duel!");
 		attacker.sendRawMessage("You have accepted the Challenge!");
 		Bukkit.broadcastMessage(target.getDisplayName() + " and " + attacker.getDisplayName() + " are beginning to duel!!");
 
-		attacker.setHealth(20.0);
+		attacker.setHealth(20.0); // sets health to full, restores all hunger, and increases saturation
 		target.setHealth(20.0);
+		attacker.setFoodLevel(20);
+		target.setFoodLevel(20);
 		attacker.setSaturation(10);
 		target.setSaturation(10);
 		
-		// saves inventory, then replaces it with the duel inventory.
-		
-		SaveData.save(attacker);
+		SaveData.save(attacker); // saves inventory, then replaces it with the duel inventory.
 		SaveData.save(target);
 		SaveData.loadout(attacker);
 		SaveData.loadout(target);
 		
-		target.removeScoreboardTag(attacker.getUniqueId() + "-Request");
-		attacker.removeScoreboardTag(target.getUniqueId() + "-Send");
-		
-		attacker.addScoreboardTag("inBattle-"); // --- adds tags that allow only the other person to attack them
-		target.addScoreboardTag("inBattle-");
+		playerState.put(attacker, "inBattle-"); // --- disables (most) incoming attack damage
+		playerState.put(target, "inBattle-");
 
 		attacker.sendTitle("3", "", 2, 16, 2); // ------------------------------------------------------- onscreen animations and countdown
 		target.sendTitle("3", "", 2, 16, 2);
@@ -114,12 +116,8 @@ public class PlayerEvents implements Listener {
         						attacker.sendTitle("D    U    E    L    !", "", 0, 20, 4);
         						target.sendTitle("D    U    E    L    !", "", 0, 20, 4);
         						
-        						
-        						target.removeScoreboardTag("inBattle-");
-        						attacker.removeScoreboardTag("inBattle-");
-        						
-        						attacker.addScoreboardTag("inBattle-" + target.getUniqueId()); // --- adds tags that allow only the other person to attack them
-        						target.addScoreboardTag("inBattle-" + attacker.getUniqueId());
+        						playerState.put(attacker, "inBattle-" + target.getUniqueId()); // --- adds tags that allow only the other person to attack them
+        						playerState.put(target, "inBattle-" + attacker.getUniqueId());
                 				
         						Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(Main.plugin, new Runnable() {
                 					@Override
@@ -141,7 +139,6 @@ public class PlayerEvents implements Listener {
                                         					public void run() {
                                         						attacker.sendTitle("DUEL!", "", 0, 20, 4);
                                         						target.sendTitle("DUEL!", "", 0, 20, 4);
-
                                         					}
                                         				}, 2);
                                 					}
@@ -164,30 +161,39 @@ public class PlayerEvents implements Listener {
 		if (e.getEntity() instanceof Player && e.getDamager() instanceof Player) { // gets all players in the situation
 			Player target = (Player) e.getEntity();
 			Player attacker = (Player) e.getDamager();
+			
+			playerState.put(attacker, ""); // adds players to the hashmap with the default value
+			playerState.put(target, "");
+			
 			// if in a battle already -- V
-			if (target.getScoreboardTags().contains("inBattle-" + attacker.getUniqueId()) && attacker.getScoreboardTags().contains("inBattle-" + target.getUniqueId())) {
-				if (e.getFinalDamage() > target.getHealth()) { // quality of life and messages
+			
+			Material mainHand = attacker.getInventory().getItemInMainHand().getType();
+			
+			if (playerState.get(target).contains("inBattle-" + attacker.getUniqueId()) && playerState.get(attacker).contains("inBattle-" + target.getUniqueId())) { // ends the duel if the Target would otherwise die in the next hit
+				if (e.getFinalDamage() > target.getHealth()) { 
 					e.setDamage(0);
 					endDuel(target, attacker);
 				}
 				
-				
-			// if not in a battle, and target doesnt have 
-			} else if (!target.getScoreboardTags().contains("inBattle-") || !attacker.getScoreboardTags().contains("inBattle-") && (attacker.getInventory().getItemInMainHand().getType() == Material.IRON_SWORD || attacker.getInventory().getItemInMainHand().getType() == Material.DIAMOND_SWORD || attacker.getInventory().getItemInMainHand().getType() == Material.GOLDEN_SWORD || attacker.getInventory().getItemInMainHand().getType() == Material.STONE_SWORD || attacker.getInventory().getItemInMainHand().getType() == Material.NETHERITE_SWORD || attacker.getInventory().getItemInMainHand().getType() == Material.WOODEN_SWORD)) { // if someone is not in a duel:
+			} else if ((!playerState.get(target).contains("inBattle-") || !playerState.get(attacker).contains("inBattle-")) && 
+					(mainHand == Material.IRON_SWORD || mainHand == Material.DIAMOND_SWORD || mainHand == Material.GOLDEN_SWORD || 
+					mainHand == Material.STONE_SWORD || mainHand == Material.NETHERITE_SWORD || mainHand == Material.WOODEN_SWORD)) { // checks to see if either of the players are in a duel, (or are in the countdown) and if they are attacking with a sword
 				
 				e.setCancelled(true);
 				
-				Bukkit.broadcastMessage("not in battle");
-				if (!attacker.getScoreboardTags().contains(target.getUniqueId() + "-Send") && !target.getScoreboardTags().contains(attacker.getUniqueId() + "-Request")) {
-					if (attacker.getScoreboardTags().contains("timeout")) {
-						attacker.sendMessage("You need to wait 10 seconds before you can duel again.");
-					} else if (target.getScoreboardTags().contains("timeout")) {
+				if (!playerState.get(attacker).contains(target.getUniqueId() + "-Send") && !playerState.get(target).contains(attacker.getUniqueId() + "-Request")) {
+					
+					if (playerState.get(attacker).contains("timeout")) {
+						attacker.sendMessage("You need to wait 10 seconds before you can duel again."); // ---- error messages
+						
+					} else if (playerState.get(target).contains("timeout")) {
 						attacker.sendMessage("You can't duel them, they just got out of a duel!");
+						
 					} else {
-						duelRequest(target, attacker);
+						duelRequest(target, attacker); // if both attacker and target are out of cooldown
 					}
 				// if not above function 
-				} else if (attacker.getScoreboardTags().contains(target.getUniqueId() + "-Request") && target.getScoreboardTags().contains(attacker.getUniqueId() + "-Send")){
+				} else if (playerState.get(attacker).contains(target.getUniqueId() + "-Request") && playerState.get(target).contains(attacker.getUniqueId() + "-Send")){
 					duelAccept(target, attacker);
 				}
 			} 
@@ -196,8 +202,8 @@ public class PlayerEvents implements Listener {
 	
 	@EventHandler
 	public void noFallDamage(EntityDamageEvent e) { // --------------------- disables certain kinds of damage only if they are in a duel
-		if (e.getEntity().getScoreboardTags().contains("inBattle-")) {
-			if (gM(EntityDamageEvent.DamageCause.ENTITY_ATTACK, e) ||  gM(EntityDamageEvent.DamageCause.SUICIDE, e) ||  gM(EntityDamageEvent.DamageCause.MAGIC, e) || gM(EntityDamageEvent.DamageCause.VOID, e)) {
+		if (playerState.get(e.getEntity()).contains("inBattle-")) {
+			if (gM(EntityDamageEvent.DamageCause.ENTITY_ATTACK, e) ||  gM(EntityDamageEvent.DamageCause.SUICIDE, e) || gM(EntityDamageEvent.DamageCause.VOID, e)) {
 				e.setCancelled(true);
 			}
 		}
@@ -210,23 +216,15 @@ public class PlayerEvents implements Listener {
 	@EventHandler
 	public void inventoryRestorerPt1(PlayerQuitEvent pQ) { // method for when a player in a duel leaves the server
 		
-		
-		
 		Player simp = pQ.getPlayer();
 		
-		if (simp.getScoreboardTags().contains("inBattle-")) {
+		if (playerState.get(simp).contains("inBattle-")) {
 			Bukkit.broadcastMessage("A player left, the Duel has been cancelled!"); // notification message to all players ...
-			Set<String> gamerMoment = simp.getScoreboardTags();
-			for (String microMoment : gamerMoment) {  // ------ looks for the -Request suffix to the tag they probably have
-    			if (microMoment.contains("inBattle-")) {
-    				UUID plaer = UUID.fromString(microMoment.replace("inBattle-", ""));
-    				Player Chad = Bukkit.getPlayer(plaer);
-    				SaveData.loadPlayer(Chad); // ----------------gives back inventories, and removes special tags
-    				SaveData.loadPlayer(simp);
-    				simp.removeScoreboardTag("inBattle-" + Chad.getUniqueId());
-					Chad.removeScoreboardTag("inBattle-" + simp.getUniqueId());
-    			}
-			}	
+			
+    		UUID plaer = UUID.fromString(playerState.get(simp).replace("inBattle-", "")); // finds other person in the duel
+    		Player Chad = Bukkit.getPlayer(plaer);
+    		
+    		endDuel(Chad, simp); // calls endDuel function
 		}
 	}
 }

@@ -16,12 +16,12 @@ import org.bukkit.inventory.PlayerInventory;
 
 public class SaveData {
 	
-	
+	static File file1 = new File(Main.plugin.getDataFolder() + File.separator + "database.yml"); // Creates a File object
+	static FileConfiguration database1 = YamlConfiguration.loadConfiguration(file1); // Turns the File object into YAML and loads data
 	
 	public static void save(Player uuid) {
 		
-		File file1 = new File(Main.plugin.getDataFolder() + File.separator + uuid.getUniqueId().toString() + ".yml"); // Creates a File object
-		FileConfiguration database1 = YamlConfiguration.loadConfiguration(file1); // Turns the File object into YAML and loads data
+		
 		
 		PlayerInventory PI = uuid.getInventory();
 		
@@ -54,7 +54,7 @@ public class SaveData {
 			}
 			System.out.println(Sitem);
 			
-			database1.set(String.valueOf(recursion), Sitem); // sets recursion value (inventory spot) to the ItemStack
+			database1.set(uuid.getUniqueId() + String.valueOf(recursion), Sitem); // sets recursion value (inventory spot) to the ItemStack
 			
 			recursion += 1; // goes to the next index
 			
@@ -75,10 +75,22 @@ public class SaveData {
 		}
 	}
 	
-	public static void loadPlayer(Player gamer) { // -------------------- !-- LOAD DATA --! 
+	public static void loadPlayer(Player gamer) { // -------------------- !-- LOAD DATA --! loads and gets inventory 
 		
-		File file1 = new File(Main.plugin.getDataFolder() + File.separator + gamer.getUniqueId().toString() + ".yml"); // Creates a File object
-		FileConfiguration database1 = YamlConfiguration.loadConfiguration(file1); // Turns the File object into YAML and loads data
+		if (!file1.exists()) // If the file doesn't exist, create one
+		{
+			try {
+				file1.createNewFile(); // makes a new file
+				
+			} catch (IOException e) {
+				e.printStackTrace(); // catch
+			}
+		} else if (file1.exists()) { // If it does exist, load in some data if needed
+			
+			// ignore for now lol
+			// get the variables from database here
+		}
+		
 		
 		if (file1.exists()) {
 			try {
@@ -92,7 +104,7 @@ public class SaveData {
 					
 					
 					
-					ItemStack e = (ItemStack) database1.get(String.valueOf(recursion));
+					ItemStack e = (ItemStack) database1.get(gamer.getUniqueId() + String.valueOf(recursion));
 					gamer.getInventory().setItem(recursion, e); // sets the item to that ItemStack
 					
 					
@@ -115,27 +127,37 @@ public class SaveData {
 	
 	public static void loadout(Player gamer) { // -------------------- !-- LOAD DATA --! 
 		
-		File file1 = new File(Main.plugin.getDataFolder() + File.separator + "loadout.yml"); // Creates a File object
-		FileConfiguration database1 = YamlConfiguration.loadConfiguration(file1); // Turns the File object into YAML and loads data
+		File file2 = new File(Main.plugin.getDataFolder() + File.separator + "loadout.yml"); // Creates a File object
+		FileConfiguration database2 = YamlConfiguration.loadConfiguration(file1); // Turns the File object into YAML and loads data
 		
-		if (file1.exists()) {
+		
+		if (!file2.exists()) // If the file doesn't exist, create one
+		{
 			try {
-				database1.load(file1); // loads file (duh)
+				file2.createNewFile(); // makes a new file
 				
+			} catch (IOException e) {
+				e.printStackTrace(); // catch
+			}
+		} else if (file2.exists()) { // If it does exist, load in some data if needed
+			
+			// ignore for now lol
+			// get the variables from database here
+		}
+		
+		if (file2.exists()) {
+			try {
+				database2.load(file2); // loads file (duh)
 				
 				int recursion = 0;
 				PlayerInventory PI = gamer.getInventory();
 				
 				for (@SuppressWarnings("unused") ItemStack item : PI.getContents()) { // begin FOR loop
 					
-					
-					
-					ItemStack e = (ItemStack) database1.get(String.valueOf(recursion));
+					ItemStack e = (ItemStack) database2.get(String.valueOf(recursion));
 					gamer.getInventory().setItem(recursion, e); // sets the item to that ItemStack
 					
-					
 					recursion += 1; // next index
-				
 				}
 				
 			} catch (FileNotFoundException e) {
@@ -153,8 +175,19 @@ public class SaveData {
 	
 	public static void Scoreboard(Player gamer, boolean increase) { // -------------------- !-- LOAD DATA --! 
 		
-		File file1 = new File(Main.plugin.getDataFolder() + File.separator + "database.yml"); // Creates a File object
-		FileConfiguration database1 = YamlConfiguration.loadConfiguration(file1); // Turns the File object into YAML and loads data
+		if (!file1.exists()) // If the file doesn't exist, create one
+		{
+			try {
+				file1.createNewFile(); // makes a new file
+				
+			} catch (IOException e) {
+				e.printStackTrace(); // catch
+			}
+		} else if (file1.exists()) { // If it does exist, load in some data if needed
+			
+			// ignore for now lol
+			// get the variables from database here
+		}
 		
 		if (file1.exists()) {
 			try {
@@ -189,8 +222,19 @@ public class SaveData {
 	
 	public static void getScore(Player sender, boolean wins) { // -------------------- !-- LOAD DATA --! 
 		
-		File file1 = new File(Main.plugin.getDataFolder() + File.separator + "database.yml"); // Creates a File object
-		FileConfiguration database1 = YamlConfiguration.loadConfiguration(file1); // Turns the File object into YAML and loads data
+		if (!file1.exists()) // If the file doesn't exist, create one
+		{
+			try {
+				file1.createNewFile(); // makes a new file
+				
+			} catch (IOException e) {
+				e.printStackTrace(); // catch
+			}
+		} else if (file1.exists()) { // If it does exist, load in some data if needed
+			
+			// ignore for now lol
+			// get the variables from database here
+		}
 		
 		if (file1.exists()) {
 			try {
@@ -214,11 +258,6 @@ public class SaveData {
 						}
 					}
 				}
-				
-				
-				
-				
-				
 				
 			} catch (FileNotFoundException e) {
 				// TODO Auto-generated catch block
