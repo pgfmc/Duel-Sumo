@@ -246,7 +246,7 @@ public class SaveData {
 						if (player.contains("-W")) {
 							UUID plaer = UUID.fromString(player.replace("-W", ""));
 	    					Player hehe = Bukkit.getPlayer(plaer);
-	    					sender.sendMessage(hehe.getDisplayName().toString() + " : " + String.valueOf(map.get(player)) + " Wins");
+	    					sender.sendMessage(hehe.getDisplayName().toString() + " : " + String.valueOf(map.get(player)) + " §6Wins");
 						}
 					}
 				} else {
@@ -254,7 +254,7 @@ public class SaveData {
 						if (player.contains("-L")) {
 							UUID plaer = UUID.fromString(player.replace("-L", ""));
 	    					Player hehe = Bukkit.getPlayer(plaer);
-	    					sender.sendMessage(hehe.getDisplayName().toString() + " : " + String.valueOf(map.get(player)) + " Losses");
+	    					sender.sendMessage(hehe.getDisplayName().toString() + " : " + String.valueOf(map.get(player)) + " §6Losses");
 						}
 					}
 				}

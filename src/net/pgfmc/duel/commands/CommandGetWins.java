@@ -18,5 +18,4 @@ public class CommandGetWins implements CommandExecutor {
 
 		return false;
 	}
-
 }

@@ -5,11 +5,13 @@ import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
 import net.pgfmc.duel.Main;
@@ -30,7 +32,7 @@ public class PlayerEvents implements Listener {
 		
 		target.setHealth(20.0);
 		attacker.setHealth(20.0);
-		Bukkit.broadcastMessage(attacker.getDisplayName() + " won the Duel!!");
+		Bukkit.broadcastMessage(attacker.getDisplayName() + " §6won the §cDuel!!");
 		
 		playerState.put(attacker, "timeout");
 		playerState.put(target, "timeout");
@@ -54,10 +56,10 @@ public class PlayerEvents implements Listener {
 	}
 	
 	public void duelRequest(Player target, Player attacker) { // Duel Requester
-		attacker.sendRawMessage("Duel Request sent! Request will expire in 60 seconds."); //  sent to the sender
-		target.sendRawMessage(attacker.getDisplayName() + " has Challenged you to a Duel!!"); // message sent to the target
-		target.sendRawMessage("To accept the Challenge, hit them back!");
-		target.sendRawMessage("This Challenge will expire in 60 seconds.");
+		attacker.sendRawMessage("§cDuel §6Request sent! Request will expire in 60 seconds."); //  sent to the sender
+		target.sendRawMessage(attacker.getDisplayName() + " §6has Challenged you to a §cDuel!!"); // message sent to the target
+		target.sendRawMessage("§6To accept the Challenge, hit them back!");
+		target.sendRawMessage("§6The Challenge will expire in 60 seconds.");
 		
 		target.addScoreboardTag(attacker.getUniqueId() + "-Request"); // gives target the scoreboard tag when they are sent a request
 		attacker.addScoreboardTag(target.getUniqueId() + "-Send"); // gives sender the scoreboard tag when they send a request
@@ -70,7 +72,7 @@ public class PlayerEvents implements Listener {
             	if (attacker.getScoreboardTags().contains(target.getUniqueId() + "-Send") || target.getScoreboardTags().contains(attacker.getUniqueId() + "-Request")) {
             		target.removeScoreboardTag(attacker.getUniqueId() + "-Request");
             		attacker.removeScoreboardTag(target.getUniqueId() + "-Send");
-            		attacker.sendRawMessage("The Challenge has expired!");
+            		attacker.sendRawMessage("§6The Challenge has expired!");
             	}
             }
             
@@ -79,8 +81,8 @@ public class PlayerEvents implements Listener {
 	
 	public void duelAccept(Player target, Player attacker) { // Duel Acceptor
 		
-		target.sendRawMessage(attacker.getName() + " has accepted your Challenge to Duel!");
-		attacker.sendRawMessage("You have accepted the Challenge!");
+		target.sendRawMessage(attacker.getName() + " §6has accepted your Challenge to §cDuel!");
+		attacker.sendRawMessage("§6You have accepted the Challenge!");
 		Bukkit.broadcastMessage(target.getDisplayName() + " and " + attacker.getDisplayName() + " are beginning to duel!!");
 
 		attacker.setHealth(20.0); // sets health to full, restores all hunger, and increases saturation
@@ -95,26 +97,26 @@ public class PlayerEvents implements Listener {
 		SaveData.loadout(attacker);
 		SaveData.loadout(target);
 		
-		playerState.put(attacker, "inBattle-"); // --- disables (most) incoming attack damage
-		playerState.put(target, "inBattle-");
+		playerState.put(attacker, "inBattle"); // --- disables (most) incoming attack damage
+		playerState.put(target, "inBattle");
 
-		attacker.sendTitle("3", "", 2, 16, 2); // ------------------------------------------------------- onscreen animations and countdown
-		target.sendTitle("3", "", 2, 16, 2);
+		attacker.sendTitle("§c3", "", 2, 16, 2); // ------------------------------------------------------- onscreen animations and countdown
+		target.sendTitle("§c3", "", 2, 16, 2);
 		Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(Main.plugin, new Runnable() {
 			@Override
 			public void run() {
-				attacker.sendTitle("2", "", 2, 16, 2);
-				target.sendTitle("2", "", 2, 16, 2);
+				attacker.sendTitle("§c2", "", 2, 16, 2);
+				target.sendTitle("§c2", "", 2, 16, 2);
 				Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(Main.plugin, new Runnable() {
 					@Override
 					public void run() {
-						attacker.sendTitle("1", "", 2, 16, 4);
-						target.sendTitle("1", "", 2, 16, 4);
+						attacker.sendTitle("§c1", "", 2, 16, 4);
+						target.sendTitle("§c1", "", 2, 16, 4);
 						Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(Main.plugin, new Runnable() {
         					@Override
         					public void run() {
-        						attacker.sendTitle("D    U    E    L    !", "", 0, 20, 4);
-        						target.sendTitle("D    U    E    L    !", "", 0, 20, 4);
+        						attacker.sendTitle("§6D    U    E    L    !", "", 0, 20, 4);
+        						target.sendTitle("§6D    U    E    L    !", "", 0, 20, 4);
         						
         						playerState.put(attacker, "inBattle-" + target.getUniqueId()); // --- adds tags that allow only the other person to attack them
         						playerState.put(target, "inBattle-" + attacker.getUniqueId());
@@ -122,23 +124,23 @@ public class PlayerEvents implements Listener {
         						Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(Main.plugin, new Runnable() {
                 					@Override
                 					public void run() {
-                						attacker.sendTitle("D   U   E   L   !", "", 0, 20, 4);
-                						target.sendTitle("D   U   E   L   !", "", 0, 20, 4);
+                						attacker.sendTitle("§6D   U   E   L   !", "", 0, 20, 4);
+                						target.sendTitle("§6D   U   E   L   !", "", 0, 20, 4);
                 						Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(Main.plugin, new Runnable() {
                         					@Override
                         					public void run() {
-                        						attacker.sendTitle("D  U  E  L  !", "", 0, 20, 4);
-                        						target.sendTitle("D  U  E  L  !", "", 0, 20, 4);
+                        						attacker.sendTitle("§6D  U  E  L  !", "", 0, 20, 4);
+                        						target.sendTitle("§6D  U  E  L  !", "", 0, 20, 4);
                         						Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(Main.plugin, new Runnable() {
                                 					@Override
                                 					public void run() {
-                                						attacker.sendTitle("D U E L !", "", 0, 20, 4);
-                                						target.sendTitle("D U E L !", "", 0, 20, 4);
+                                						attacker.sendTitle("§6D U E L !", "", 0, 20, 4);
+                                						target.sendTitle("§6D U E L !", "", 0, 20, 4);
                                 						Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(Main.plugin, new Runnable() {
                                         					@Override
                                         					public void run() {
-                                        						attacker.sendTitle("DUEL!", "", 0, 20, 4);
-                                        						target.sendTitle("DUEL!", "", 0, 20, 4);
+                                        						attacker.sendTitle("§6DUEL!", "", 0, 20, 4);
+                                        						target.sendTitle("§6DUEL!", "", 0, 20, 4);
                                         					}
                                         				}, 2);
                                 					}
@@ -175,7 +177,7 @@ public class PlayerEvents implements Listener {
 					endDuel(target, attacker);
 				}
 				
-			} else if ((!playerState.get(target).contains("inBattle-") || !playerState.get(attacker).contains("inBattle-")) && 
+			} else if ((!playerState.get(target).contains("inBattle") || !playerState.get(attacker).contains("inBattle")) && 
 					(mainHand == Material.IRON_SWORD || mainHand == Material.DIAMOND_SWORD || mainHand == Material.GOLDEN_SWORD || 
 					mainHand == Material.STONE_SWORD || mainHand == Material.NETHERITE_SWORD || mainHand == Material.WOODEN_SWORD)) { // checks to see if either of the players are in a duel, (or are in the countdown) and if they are attacking with a sword
 				
@@ -184,10 +186,10 @@ public class PlayerEvents implements Listener {
 				if (!playerState.get(attacker).contains(target.getUniqueId() + "-Send") && !playerState.get(target).contains(attacker.getUniqueId() + "-Request")) {
 					
 					if (playerState.get(attacker).contains("timeout")) {
-						attacker.sendMessage("You need to wait 10 seconds before you can duel again."); // ---- error messages
+						attacker.sendMessage("§6You need to wait 10 seconds before you can §cDuel §6again."); // ---- error messages
 						
 					} else if (playerState.get(target).contains("timeout")) {
-						attacker.sendMessage("You can't duel them, they just got out of a duel!");
+						attacker.sendMessage("§6You can't duel them, they just got out of a §cDuel!");
 						
 					} else {
 						duelRequest(target, attacker); // if both attacker and target are out of cooldown
@@ -202,7 +204,7 @@ public class PlayerEvents implements Listener {
 	
 	@EventHandler
 	public void noFallDamage(EntityDamageEvent e) { // --------------------- disables certain kinds of damage only if they are in a duel
-		if (playerState.get(e.getEntity()).contains("inBattle-")) {
+		if (playerState.get(e.getEntity()).contains("inBattle")) {
 			if (gM(EntityDamageEvent.DamageCause.ENTITY_ATTACK, e) ||  gM(EntityDamageEvent.DamageCause.SUICIDE, e) || gM(EntityDamageEvent.DamageCause.VOID, e)) {
 				e.setCancelled(true);
 			}
@@ -213,18 +215,49 @@ public class PlayerEvents implements Listener {
 		return(e.getCause() != gamer);
 	}
 	
-	@EventHandler
-	public void inventoryRestorerPt1(PlayerQuitEvent pQ) { // method for when a player in a duel leaves the server
-		
-		Player simp = pQ.getPlayer();
+	public void forfeit(Player simp) { // handles forefits
 		
 		if (playerState.get(simp).contains("inBattle-")) {
-			Bukkit.broadcastMessage("A player left, the Duel has been cancelled!"); // notification message to all players ...
+			
 			
     		UUID plaer = UUID.fromString(playerState.get(simp).replace("inBattle-", "")); // finds other person in the duel
     		Player Chad = Bukkit.getPlayer(plaer);
     		
+    		Bukkit.broadcastMessage(simp.getDisplayName() + " §6has forfeit the §cDuel! " + Chad.getDisplayName() + " §6Wins!"); // notification message to all players ...
+    		
     		endDuel(Chad, simp); // calls endDuel function
+		}
+	}
+	
+	@EventHandler
+	public void inventoryRestorerPt1(PlayerQuitEvent pQ) { // method for when a player in a duel leaves the server
+		Player simp = pQ.getPlayer();
+		forfeit(simp);
+	}
+	
+	public void dropsItem(PlayerDropItemEvent e) { //when someone drops an item in battle
+		Player simp = e.getPlayer();
+		Item chungaloid = e.getItemDrop();
+		
+		if (playerState.get(simp).contains("inBattle-")) {
+			
+			if (chungaloid.getItemStack().getType() == Material.IRON_SWORD) {
+				
+				chungaloid.setInvulnerable(true); // allows the item to land on the ground, and then runs forfeit
+				chungaloid.setPickupDelay(1000);
+				forfeit(simp);
+				Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(Main.plugin, new Runnable() {
+					@Override
+					public void run() {
+						chungaloid.remove();
+					}
+				}, 30);
+				
+				
+			} else {
+				simp.getInventory().setItemInMainHand(chungaloid.getItemStack()); // gives item back to the dropper, then removes the item
+				chungaloid.remove();
+			}
 		}
 	}
 }
