@@ -23,7 +23,7 @@ public class PlayerEvents implements Listener {
 	
 	private static HashMap<Player, String> playerState = new HashMap<>(); // hashmap that stores the state of the player in a duel
 	
-	public void endDuel(Player target, Player attacker) { // ends the duel, and restores health
+	private void endDuel(Player target, Player attacker) { // ends the duel, and restores health
 		
 		attacker.setHealth(20.0);
 		target.setHealth(20.0);
@@ -48,14 +48,14 @@ public class PlayerEvents implements Listener {
         }, 20 * 10);
 	}
 	
-	public void duelRequest(Player target, Player attacker) { // ----------------------------------------------------------------- Duel Requester
+	private void duelRequest(Player target, Player attacker) { // ----------------------------------------------------------------- Duel Requester
 		attacker.sendRawMessage("§cDuel §6Request sent! Request will expire in 60 seconds."); //  sent to the sender
 		target.sendRawMessage(attacker.getDisplayName() + " §6has Challenged you to a §cDuel!!"); // message sent to the target
 		target.sendRawMessage("§6To accept the Challenge, hit them back!");
 		target.sendRawMessage("§6The Challenge will expire in 60 seconds.");
 		
-		target.addScoreboardTag(attacker.getUniqueId() + "-Request"); // gives target the scoreboard tag when they are sent a request
-		attacker.addScoreboardTag(target.getUniqueId() + "-Send"); // gives sender the scoreboard tag when they send a request
+		playerState.put(target, attacker.getUniqueId() + "-Request"); // gives target the scoreboard tag when they are sent a request
+		playerState.put(attacker, target.getUniqueId() + "-Send"); // gives sender the scoreboard tag when they send a request
 		
 		Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(Main.plugin, new Runnable() {
             
@@ -63,16 +63,19 @@ public class PlayerEvents implements Listener {
             public void run() // 60 second long cooldown, in which the plugin will wait for 
             {
             	if (playerState.get(attacker).contains(target.getUniqueId() + "-Send") || playerState.get(target).contains(attacker.getUniqueId() + "-Request")) {
+            		
+            		playerState.put(attacker, "default");
+            		playerState.put(target, "default");
+            		
             		target.removeScoreboardTag(attacker.getUniqueId() + "-Request");
             		attacker.removeScoreboardTag(target.getUniqueId() + "-Send");
             		attacker.sendRawMessage("§6The Challenge has expired!");
             	}
             }
-            
-        }, 20 * 60);
+        }, 1200);
 	}
 	
-	public void duelAccept(Player target, Player attacker) { // Duel Acceptor
+	private void duelAccept(Player target, Player attacker) { // Duel Acceptor
 		
 		target.sendRawMessage(attacker.getName() + " §6has accepted your Challenge to §cDuel!");
 		attacker.sendRawMessage("§6You have accepted the Challenge!");
@@ -153,9 +156,14 @@ public class PlayerEvents implements Listener {
 	@EventHandler 
 	public void attackRouter(EntityDamageByEntityEvent e) {// ----------------------------------------------------------- directs each situation to their designated function above :)
 		
+		Bukkit.broadcastMessage(playerState.toString());
+		
 		if (e.getEntity() instanceof Player && e.getDamager() instanceof Player) { // gets all players in the situation
 			Player target = (Player) e.getEntity();
 			Player attacker = (Player) e.getDamager();
+			
+			hashImp(attacker);
+			hashImp(target);
 			
 			// if in a battle already -- V
 			
@@ -175,7 +183,9 @@ public class PlayerEvents implements Listener {
 					
 					e.setCancelled(true);
 					
-					if (!playerState.get(attacker).contains(target.getUniqueId() + "-Send") && !playerState.get(target).contains(attacker.getUniqueId() + "-Request")) {
+					if (!playerState.get(attacker).contains(target.getUniqueId() + "-Request") && !playerState.get(target).contains(attacker.getUniqueId() + "-Send")) {
+						
+						
 						
 						if (playerState.get(attacker).contains("timeout")) {
 							attacker.sendMessage("§6You need to wait 10 seconds before you can §cDuel §6again."); // ---- error messages if still in cooldown
@@ -196,7 +206,7 @@ public class PlayerEvents implements Listener {
 	}
 	
 	@EventHandler
-	public void noFallDamage(EntityDamageEvent e) { // --------------------- disables certain kinds of damage only if they are in a duel
+	public void noDamage(EntityDamageEvent e) { // --------------------- disables certain kinds of damage only if they are in a duel
 		
 		if (e.getEntity() instanceof Player) {
 			Player gamer = (Player) e.getEntity();
@@ -209,11 +219,13 @@ public class PlayerEvents implements Listener {
 		}
 	}
 	
-	public boolean gM(EntityDamageEvent.DamageCause gamer, EntityDamageEvent e) { // custom function used in noFallDamage() to make all the code fit on one screen
+	private boolean gM(EntityDamageEvent.DamageCause gamer, EntityDamageEvent e) { // custom function used in noFallDamage() to make all the code fit on one screen
 		return(e.getCause() != gamer);
 	}
 	
-	public void forfeit(Player simp) { // handles forefits
+	private void forfeit(Player simp) { // handles forfeits
+		
+		
 		
 		if (playerState.get(simp).contains("inBattle-")) {
 			
@@ -229,15 +241,17 @@ public class PlayerEvents implements Listener {
 	@EventHandler
 	public void inventoryRestorerPt1(PlayerQuitEvent pQ) { // method for when a player in a duel leaves the server
 		Player simp = pQ.getPlayer();
-		forfeit(simp);
-		playerState.remove(simp);
+		if (playerState.get(simp) != null) {
+			forfeit(simp);
+			playerState.remove(simp);
+		}
 	}
 	
 	@EventHandler
 	public void dropsItem(PlayerDropItemEvent e) { //when someone drops an item in battle
 		Player simp = e.getPlayer();
 		Item chungaloid = e.getItemDrop();
-		
+		hashImp(simp);
 		if (playerState.get(simp).contains("inBattle-")) {
 			
 			if (chungaloid.getItemStack().getType() == Material.IRON_SWORD) {
@@ -265,10 +279,14 @@ public class PlayerEvents implements Listener {
 		Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(Main.plugin, new Runnable() {
 			@Override
 			public void run() {
-				Player gamer = (Player) e.getPlayer();
-				playerState.put(gamer, "default");
+				hashImp(e.getPlayer());
 			}
 		}, 30);
-		
+	}
+	
+	private void hashImp(Player player) { // add the player to playerState if they arent already in it
+		if (playerState.get(player) == null) {
+			playerState.put(player, "default");
+		}
 	}
 }

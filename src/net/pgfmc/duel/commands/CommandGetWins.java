@@ -15,7 +15,9 @@ public class CommandGetWins implements CommandExecutor {
 		Player player = (Player) sender;
 
 		SaveData.getScore(player, true); // umm yeah
-
+		
+		sender.sendMessage("gaming1");
+		
 		return true;
 	}
 }
