@@ -16,8 +16,6 @@ public class CommandGetLosses implements CommandExecutor {
 
 		SaveData.getScore(player, false);
 		
-		sender.sendMessage("gaming2");
-		
 		return true;
 	}
 }
