@@ -21,12 +21,11 @@ public class Main extends JavaPlugin {
 	public void onEnable() {
 		//this.getCommand("duelStart").setExecutor(new CommandDuel()); // command loading
 		
-		this.getCommand("scoreOfWins").setExecutor(new CommandGetWins());
+		getCommand("Wins").setExecutor(new CommandGetWins());
 		
-		this.getCommand("scoreOfLosses").setExecutor(new CommandGetLosses());
+		getCommand("Losses").setExecutor(new CommandGetLosses());
 		
 		getServer().getPluginManager().registerEvents(new PlayerEvents(), this); // loads PlayerEvents.java
-		
 		
 		plugin = this;
 	}

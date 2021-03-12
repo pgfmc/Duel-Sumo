@@ -10,13 +10,11 @@ commands:
     #usage: /duel
     #permission: Duels.duelStart
     #aliases: [duel, duelaccept, da]
-  scoreOfWins:
+  Wins:
     description: Gets the amount of wins of all players on the server
     usage: /scoreOfWins
     permission: Duels.scoreOfWins
-    aliases: [SOW, Wins, duelWs]
-  scoreOfLosses:
+  Losses:
     description: Gets the amount of losses of all players on the server
     usage: /scoreOfLosses
     permission: Duels.scoreOfLosses
-    aliases: [SOL, Losses, duelLs]

@@ -196,10 +196,10 @@ public class SaveData {
 				
 				if (increase) { // -------------------------------------------------------------- for win score recording
 					int score = (int) database1.getInt(gamer.getUniqueId().toString() + "-W");
-					database1.set(gamer.getUniqueId().toString(), score + 1);
+					database1.set(gamer.getUniqueId().toString() + "-W", score + 1);
 				} else { // --------------------------------------------------------------------- for loss score recording
 					int score = (int) database1.getInt(gamer.getUniqueId().toString() + "-L");
-					database1.set(gamer.getUniqueId().toString(), score - 1);
+					database1.set(gamer.getUniqueId().toString() + "-L", score - 1);
 				}
 			} catch (FileNotFoundException e) {
 				// TODO Auto-generated catch block
@@ -246,16 +246,16 @@ public class SaveData {
 					for (String player : map.keySet()) { // for win score retrieval
 						if (player.contains("-W")) {
 							UUID plaer = UUID.fromString(player.replace("-W", ""));
-	    					Player hehe = Bukkit.getPlayer(plaer);
-	    					sender.sendMessage(hehe.getDisplayName().toString() + " : " + String.valueOf(map.get(player)) + " §6Wins");
+	    					OfflinePlayer hehe = Bukkit.getPlayer(plaer);
+	    					sender.sendMessage(hehe.getName().toString() + " : " + String.valueOf(map.get(player)) + " §6Wins");
 						}
 					}
 				} else {
 					for (String player : map.keySet()) { // for loss score retrieval
 						if (player.contains("-L")) {
 							UUID plaer = UUID.fromString(player.replace("-L", ""));
-	    					Player hehe = Bukkit.getPlayer(plaer);
-	    					sender.sendMessage(hehe.getDisplayName().toString() + " : " + String.valueOf(map.get(player)) + " §6Losses");
+	    					OfflinePlayer hehe = Bukkit.getPlayer(plaer);
+	    					sender.sendMessage(hehe.getName().toString() + " : " + String.valueOf(map.get(player)) + " §6Losses");
 						}
 					}
 				}
