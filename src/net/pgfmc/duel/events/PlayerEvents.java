@@ -9,6 +9,10 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.EntityPickupItemEvent;
+import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.inventory.InventoryOpenEvent;
+import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
@@ -143,6 +147,36 @@ public class PlayerEvents implements Listener {
 			} else {
 				simp.getInventory().setItemInMainHand(chungaloid.getItemStack()); // gives item back to the dropper, then removes the item
 				chungaloid.remove();
+			}
+		}
+	}
+	
+	@EventHandler
+	public void chestBlock(InventoryOpenEvent e) { // stops players in a duel from opening inventories to get special items from.
+		Player player = (Player) e.getPlayer();
+		
+		if (DuelClass.findPlayerInDuel(player).getState() == States.INBATTLE || DuelClass.findPlayerInDuel(player).getState() == States.BATTLEPENDING) {
+			if (!(e.getInventory().getType() == InventoryType.PLAYER || e.getInventory().getType() == InventoryType.CRAFTING || e.getInventory().getType() == InventoryType.WORKBENCH)) {
+				e.setCancelled(true);
+				player.sendMessage("§6Wait until you're finished fighting before you do that :)");
+			}
+		}
+	}
+	
+	public void itemBlock(EntityPickupItemEvent e) { // doesn't allow items to be picked up while in a duel
+		if (e.getEntity() instanceof Player) {
+			Player player = (Player) e.getEntity();
+			if (DuelClass.findPlayerInDuel(player).getState() == States.INBATTLE || DuelClass.findPlayerInDuel(player).getState() == States.BATTLEPENDING) {
+				e.setCancelled(true);
+			}
+		}
+	}
+	
+	public void onDeath(PlayerDeathEvent e) { // if a player in a duel dies, they lose and their opponent wins
+		if (e.getEntity() instanceof Player) {
+			Player player = (Player) e.getEntity();
+			if (DuelClass.findPlayerInDuel(player).getState() == States.INBATTLE || DuelClass.findPlayerInDuel(player).getState() == States.BATTLEPENDING) {
+				DuelClass.findPlayerInDuel(player).endDuel(DuelClass.findOpponent(player));
 			}
 		}
 	}

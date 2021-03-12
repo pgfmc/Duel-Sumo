@@ -33,10 +33,6 @@ public class DuelClass {
 		acceptor = CH;
 	}
 	
-	public Player[] getPlayers() {
-		return(new Player[] {provoker, acceptor});
-	}
-	
 	public States getState() {
 		return(state);
 	}
@@ -94,11 +90,11 @@ public class DuelClass {
 		
 	
 	
-	public Player getProvoker() {
+	private Player getProvoker() {
 		return(provoker);
 	}
 	
-	public Player getChallenger() {
+	private Player getChallenger() {
 		return(acceptor);
 	}
 	
