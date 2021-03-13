@@ -7,6 +7,7 @@ import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityPickupItemEvent;
@@ -127,7 +128,7 @@ public class PlayerEvents implements Listener {
 		
 		DuelClass simpage = DuelClass.findPlayerInDuel(simp);
 		
-		if (simpage != null) {
+		if (simpage != null && (simpage.getState() == States.INBATTLE || simpage.getState() == States.BATTLEPENDING)) {
 			
 			if (chungaloid.getItemStack().getType() == Material.IRON_SWORD) {
 				
@@ -155,29 +156,66 @@ public class PlayerEvents implements Listener {
 	public void chestBlock(InventoryOpenEvent e) { // stops players in a duel from opening inventories to get special items from.
 		Player player = (Player) e.getPlayer();
 		
-		if (DuelClass.findPlayerInDuel(player).getState() == States.INBATTLE || DuelClass.findPlayerInDuel(player).getState() == States.BATTLEPENDING) {
-			if (!(e.getInventory().getType() == InventoryType.PLAYER || e.getInventory().getType() == InventoryType.CRAFTING || e.getInventory().getType() == InventoryType.WORKBENCH)) {
-				e.setCancelled(true);
-				player.sendMessage("§6Wait until you're finished fighting before you do that :)");
+		DuelClass BlakeIsBest = DuelClass.findPlayerInDuel(player);
+		
+		if (BlakeIsBest != null) {
+		
+			if (BlakeIsBest.getState() == States.INBATTLE || BlakeIsBest.getState() == States.BATTLEPENDING) {
+				if (!(e.getInventory().getType() == InventoryType.PLAYER || e.getInventory().getType() == InventoryType.CRAFTING || e.getInventory().getType() == InventoryType.WORKBENCH)) {
+					e.setCancelled(true);
+					player.sendMessage("§6Wait until you're finished fighting before you do that :)");
+				}
 			}
 		}
 	}
 	
+	@EventHandler
 	public void itemBlock(EntityPickupItemEvent e) { // doesn't allow items to be picked up while in a duel
+
 		if (e.getEntity() instanceof Player) {
 			Player player = (Player) e.getEntity();
-			if (DuelClass.findPlayerInDuel(player).getState() == States.INBATTLE || DuelClass.findPlayerInDuel(player).getState() == States.BATTLEPENDING) {
-				e.setCancelled(true);
+
+			DuelClass BlakeIsBest = DuelClass.findPlayerInDuel(player);
+			
+			if (BlakeIsBest != null) {
+				if (BlakeIsBest.getState() == States.INBATTLE || BlakeIsBest.getState() == States.BATTLEPENDING) {
+
+					e.setCancelled(true);
+				}
 			}
 		}
 	}
 	
+	@EventHandler
 	public void onDeath(PlayerDeathEvent e) { // if a player in a duel dies, they lose and their opponent wins
 		if (e.getEntity() instanceof Player) {
 			Player player = (Player) e.getEntity();
-			if (DuelClass.findPlayerInDuel(player).getState() == States.INBATTLE || DuelClass.findPlayerInDuel(player).getState() == States.BATTLEPENDING) {
-				DuelClass.findPlayerInDuel(player).endDuel(DuelClass.findOpponent(player));
+			
+			DuelClass BlakeIsBest = DuelClass.findPlayerInDuel(player);
+			
+			if (BlakeIsBest != null) {
+			
+				if (BlakeIsBest.getState() == States.INBATTLE || BlakeIsBest.getState() == States.BATTLEPENDING) {
+					BlakeIsBest.endDuel(DuelClass.findOpponent(player));
+				}
 			}
 		}
+	}
+	
+	@EventHandler
+	public void breakProtIV(BlockBreakEvent e) { // stops players in a duel from breaking blocks
+		Player player = e.getPlayer();
+		
+		DuelClass BlakeIsBest = DuelClass.findPlayerInDuel(player);
+		
+		if (BlakeIsBest != null) {
+			if (BlakeIsBest.getState() == States.INBATTLE || BlakeIsBest.getState() == States.BATTLEPENDING) {
+				player.sendMessage("§6Wait until you're finished fighting before you do that :)");
+			}
+			
+			
+			
+		}
+		
 	}
 }

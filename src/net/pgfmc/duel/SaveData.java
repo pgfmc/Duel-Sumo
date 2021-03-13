@@ -53,7 +53,6 @@ public class SaveData {
 				Sitem = item;
 				
 			}
-			System.out.println(Sitem);
 			
 			database1.set(uuid.getUniqueId() + String.valueOf(recursion), Sitem); // sets recursion value (inventory spot) to the ItemStack
 			
