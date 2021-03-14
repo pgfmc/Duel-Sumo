@@ -72,16 +72,16 @@ public class PlayerEvents implements Listener {
 					}
 						
 					
-				} else if (gimme == null && isHoldingSword(attacker)) { // if there is no duel between the two
+				} else if (gimme == null && isHoldingSword(attacker) && DuelClass.findPlayerInDuel(target) == null) { // if there is no duel between the two
 					
 					DuelClass.duelRequest(attacker, target);
 					e.setCancelled(true);
 				
-				} else if (gimme == null && !isHoldingSword(attacker)) {
+				} else if (gimme == null && !isHoldingSword(attacker) && DuelClass.findPlayerInDuel(target) == null) {
 					attacker.sendMessage("§6Hit them with your sword if you want to §cDuel §6them!");
 					e.setCancelled(true);
 					
-				}else if (gimme.getState() == States.TIMEOUT) { // ------------------------------------ if attacker is in timeout
+				}else if (gimme.getState() == States.TIMEOUT || gimme.getState() == States.BATTLEPENDING || gimme.getState() == States.INBATTLE) { // ------------------------------------ if attacker is in timeout
 					attacker.sendMessage("§6Wait a little bit before you §cDuel §6them again!");
 					e.setCancelled(true);
 				}
@@ -197,6 +197,7 @@ public class PlayerEvents implements Listener {
 			
 				if (BlakeIsBest.getState() == States.INBATTLE || BlakeIsBest.getState() == States.BATTLEPENDING) {
 					BlakeIsBest.endDuel(DuelClass.findOpponent(player));
+					e.setKeepInventory(true);
 				}
 			}
 		}
