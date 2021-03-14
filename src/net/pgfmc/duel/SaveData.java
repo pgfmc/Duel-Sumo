@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Map;
-import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
@@ -242,20 +241,27 @@ public class SaveData {
 				Map<String, Object> map = database1.getValues(false);
 				
 				if (wins) {
-					for (String player : map.keySet()) { // for win score retrieval
-						if (player.contains("-W")) {
-							UUID plaer = UUID.fromString(player.replace("-W", ""));
-	    					OfflinePlayer hehe = Bukkit.getPlayer(plaer);
-	    					sender.sendMessage(hehe.getName().toString() + " : " + String.valueOf(map.get(player)) + " §6Wins");
+					
+					for (OfflinePlayer player : Bukkit.getOfflinePlayers()) {
+						
+						String stimge = player.getUniqueId().toString() + "-W";
+						
+						if (map.containsKey(stimge)) {
+							
+							sender.sendMessage(player.getName() + " : " + String.valueOf(map.get(stimge)) + " §6Wins");
 						}
+						
 					}
 				} else {
-					for (String player : map.keySet()) { // for loss score retrieval
-						if (player.contains("-L")) {
-							UUID plaer = UUID.fromString(player.replace("-L", ""));
-	    					OfflinePlayer hehe = Bukkit.getPlayer(plaer);
-	    					sender.sendMessage(hehe.getName().toString() + " : " + String.valueOf(map.get(player)) + " §6Losses");
+					for (OfflinePlayer player : Bukkit.getOfflinePlayers()) {
+						
+						String stimge = player.getUniqueId().toString() + "-L";
+						
+						if (map.containsKey(stimge)) {
+							
+							sender.sendMessage(player.getName() + " : " + String.valueOf(map.get(stimge)) + " §6Losses");
 						}
+						
 					}
 				}
 				

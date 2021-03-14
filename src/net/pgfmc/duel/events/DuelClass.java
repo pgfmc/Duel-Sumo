@@ -67,9 +67,9 @@ public class DuelClass {
 	
 	public static Player findOpponent(Player player) { // returns the opponent of that player
 		for (DuelClass animemomnets : totalObj) {
-			if (animemomnets.getProvoker() == player) {
+			if (animemomnets.getProvoker() == player && animemomnets.getState() != States.REQUESTPENDING) {
 				return(animemomnets.getChallenger());
-			} else if (animemomnets.getChallenger() == player) {
+			} else if (animemomnets.getChallenger() == player && animemomnets.getState() != States.REQUESTPENDING) {
 				return(animemomnets.getProvoker());
 			}
 		}
@@ -235,6 +235,19 @@ public class DuelClass {
             	totalObj.remove(duel);
             }
         }, 20 * 10);
+	}
+	
+	public void stopDuel() { // function to end the duel with no winner
+		
+		
+		DuelClass duel = this;
+		
+		duel.getProvoker().setHealth(20.0);
+		duel.getChallenger().setHealth(20.0);
+		SaveData.loadPlayer(duel.getProvoker());
+		SaveData.loadPlayer(duel.getChallenger());
+		totalObj.remove(duel);
+		
 	}
 
 	public void forfeit(Player simp) { // handles forfeits

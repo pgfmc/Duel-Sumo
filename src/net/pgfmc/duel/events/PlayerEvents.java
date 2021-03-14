@@ -15,6 +15,7 @@ import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.PlayerDropItemEvent;
+import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
 import net.pgfmc.duel.Main;
@@ -72,12 +73,12 @@ public class PlayerEvents implements Listener {
 					}
 						
 					
-				} else if (gimme == null && isHoldingSword(attacker) && DuelClass.findPlayerInDuel(target) == null) { // if there is no duel between the two
+				} else if (gimme == null && isHoldingSword(attacker) && DuelClass.findPlayerInDuel(target) == null && DuelClass.findPlayerInDuel(attacker) == null) { // if there is no duel between the two
 					
 					DuelClass.duelRequest(attacker, target);
 					e.setCancelled(true);
 				
-				} else if (gimme == null && !isHoldingSword(attacker) && DuelClass.findPlayerInDuel(target) == null) {
+				} else if (gimme == null && !isHoldingSword(attacker) && DuelClass.findPlayerInDuel(target) == null && DuelClass.findPlayerInDuel(attacker) == null) {
 					attacker.sendMessage("§6Hit them with your sword if you want to §cDuel §6them!");
 					e.setCancelled(true);
 					
@@ -141,7 +142,6 @@ public class PlayerEvents implements Listener {
 						
 						chungaloid.setInvulnerable(false);
 						chungaloid.remove();
-						
 					}
 				}, 30);
 				
@@ -213,10 +213,21 @@ public class PlayerEvents implements Listener {
 			if (BlakeIsBest.getState() == States.INBATTLE || BlakeIsBest.getState() == States.BATTLEPENDING) {
 				player.sendMessage("§6Wait until you're finished fighting before you do that :)");
 			}
-			
-			
-			
 		}
+	}
+	
+	@EventHandler
+	public void interdimensionBlock(PlayerMoveEvent e) { // cancels the duel if one person goes into another dimension / hub 
+		Player player = e.getPlayer();
 		
+		DuelClass BlakeIsBest = DuelClass.findPlayerInDuel(player);
+		
+		if (BlakeIsBest != null) {
+			
+			if (player.getLocation().getWorld() != DuelClass.findOpponent(player).getWorld()) {
+				BlakeIsBest.stopDuel();
+				player.sendMessage("§6Wait until you're finished fighting before you do that :)");
+			}
+		}
 	}
 }
