@@ -172,7 +172,7 @@ public class SaveData {
 		}
 	}
 	
-	public static void Scoreboard(OfflinePlayer gamer, boolean increase) { // -------------------- !-- LOAD DATA --! 
+	public static void Scoreboard(OfflinePlayer gamer) { // -------------------- !-- LOAD DATA --! 
 		
 		if (!file1.exists()) // If the file doesn't exist, create one
 		{
@@ -192,13 +192,10 @@ public class SaveData {
 			try {
 				database1.load(file1); // loads file (duh)
 				
-				if (increase) { // -------------------------------------------------------------- for win score recording
-					int score = (int) database1.getInt(gamer.getUniqueId().toString() + "-W");
-					database1.set(gamer.getUniqueId().toString() + "-W", score + 1);
-				} else { // --------------------------------------------------------------------- for loss score recording
-					int score = (int) database1.getInt(gamer.getUniqueId().toString() + "-L");
-					database1.set(gamer.getUniqueId().toString() + "-L", score - 1);
-				}
+				int score = (int) database1.getInt(gamer.getUniqueId().toString() + "-W"); // for win score recording
+
+				database1.set(gamer.getUniqueId().toString() + "-W", score + 1);
+				
 			} catch (FileNotFoundException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();

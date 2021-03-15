@@ -15,6 +15,7 @@ import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.PlayerDropItemEvent;
+import org.bukkit.event.player.PlayerGameModeChangeEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
@@ -41,50 +42,55 @@ public class PlayerEvents implements Listener {
 				
 				
 				
-				DuelClass gimme = DuelClass.findDuel(attacker, target, true);
+				DuelClass ATK = DuelClass.findDuel(attacker);
+				DuelClass DEF = DuelClass.findDuel(target);
 				
-				
-				
-				if (gimme != null && gimme.getState() != States.TIMEOUT) { // if there is no request, and duel is not in timeout
+				if (ATK == null && DEF == null) { // if neither are in a duel
 					
-					boolean gayMen = gimme.isProvoker(attacker);
-					
-					if (gimme.getState() == States.REQUESTPENDING) { // accepts the duel if elligible
-						
+					if (isHoldingSword(attacker)) {
+						DuelClass.duelRequest(attacker, target);
 						e.setCancelled(true);
 						
-						if (isHoldingSword(attacker) && !gayMen) { 
-							gimme.duelAccept();
-						}
+					} else {
+						attacker.sendMessage("§6Hit them with your sword if you want to §cDuel §6them!");
+						e.setCancelled(true);
+					}
 						
-						
-						
-						
-					} else if (gimme.getState() == States.BATTLEPENDING) { // if the duel is beginning
+				} else if (ATK != null && DEF == null) { // if attacker is in a duel, and not the target
+					e.setCancelled(true);
+	
+				} else if (ATK == null && DEF != null) { // if attacker isnt in a duel, but the target is
+					
+					if (DEF.findStateInDuel(target).getState() != PlayerState.States.KILLED) { 
+						DEF.duelStart(attacker);
 						e.setCancelled(true);
 					}
 					
-				
-					else if (gimme.getState() == States.INBATTLE) { // ends the duel if the Target would otherwise die in the next hit
-						if (e.getFinalDamage() > target.getHealth()) { 
-							e.setDamage(0);
-							gimme.endDuel(attacker);
+				} else if (ATK != null && DEF != null) { // if attacker and target are in a duel
+					
+					if (ATK == DEF) {
+						
+						if (DEF.getState() == States.INBATTLE && DEF.findStateInDuel(attacker).getState() == PlayerState.States.DUELING && DEF.findStateInDuel(target).getState() == PlayerState.States.DUELING) { // ------ if IN BATTLE stage
+						
+							if (e.getFinalDamage() > target.getHealth()) { // sets damage to 0 if they otherwise would've died, and kicks them from the duel
+								e.setDamage(0);
+								DEF.duelLeave(target);
+							} else {
+								e.setCancelled(false);
+							}
+							
+						} else if (DEF.getState() == States.BATTLEPENDING || DEF.getState() == States.TIMEOUT) {
+							e.setCancelled(true);
+							
+						} else if (DEF.getState() == States.REQUESTPENDING && DEF.isProvoker(target)){
+							DEF.duelAccept();
+							e.setCancelled(true);
 						}
 					}
-						
-					
-				} else if (gimme == null && isHoldingSword(attacker) && DuelClass.findPlayerInDuel(target) == null && DuelClass.findPlayerInDuel(attacker) == null) { // if there is no duel between the two
-					
-					DuelClass.duelRequest(attacker, target);
-					e.setCancelled(true);
-				
-				} else if (gimme == null && !isHoldingSword(attacker) && DuelClass.findPlayerInDuel(target) == null && DuelClass.findPlayerInDuel(attacker) == null) {
-					attacker.sendMessage("§6Hit them with your sword if you want to §cDuel §6them!");
-					e.setCancelled(true);
-					
-				}else if (gimme.getState() == States.TIMEOUT || gimme.getState() == States.BATTLEPENDING || gimme.getState() == States.INBATTLE) { // ------------------------------------ if attacker is in timeout
-					attacker.sendMessage("§6Wait a little bit before you §cDuel §6them again!");
-					e.setCancelled(true);
+					else {
+						attacker.sendMessage("§6They are in another §cDuel§6! You can't hit them!");
+						e.setCancelled(true);
+					}
 				}
 			}
 		}
@@ -96,8 +102,8 @@ public class PlayerEvents implements Listener {
 		if (e.getEntity() instanceof Player) {
 			Player gamer = (Player) e.getEntity();
 			
-			if (DuelClass.findPlayerInDuel(gamer) != null) {
-				if ((DuelClass.findPlayerInDuel(gamer).getState() == States.BATTLEPENDING ||  DuelClass.findPlayerInDuel(gamer).getState() == States.INBATTLE) && gamer.getGameMode() == GameMode.SURVIVAL) {
+			if (DuelClass.findDuel(gamer) != null) {
+				if ((DuelClass.findDuel(gamer).getState() == States.BATTLEPENDING ||  DuelClass.findDuel(gamer).getState() == States.INBATTLE) && gamer.getGameMode() == GameMode.SURVIVAL) {
 					if (e.getCause() != EntityDamageEvent.DamageCause.ENTITY_ATTACK) {
 						e.setCancelled(true);
 					}
@@ -109,15 +115,11 @@ public class PlayerEvents implements Listener {
 	@EventHandler
 	public void inventoryRestorerPt1(PlayerQuitEvent pQ) { // method for when a player in a duel leaves the server
 		Player simp = pQ.getPlayer();
-		DuelClass gimmer = DuelClass.findPlayerInDuel(simp);
+		DuelClass gimmer = DuelClass.findDuel(simp);
 		
 		if (gimmer != null) { // --------------------------- checks if the player is in a duel
-			Player Chad = DuelClass.findOpponent(simp);
-			
-			if (gimmer.getState() != States.REQUESTPENDING || gimmer.getState() != States.TIMEOUT) { // ends duel if in one
-				
-				gimmer.endDuel(Chad);
-			}
+
+			gimmer.duelLeave(simp);
 		}
 	}
 	
@@ -127,7 +129,7 @@ public class PlayerEvents implements Listener {
 		Item chungaloid = e.getItemDrop();
 		//hashImp(simp);
 		
-		DuelClass simpage = DuelClass.findPlayerInDuel(simp);
+		DuelClass simpage = DuelClass.findDuel(simp);
 		
 		if (simpage != null && (simpage.getState() == States.INBATTLE || simpage.getState() == States.BATTLEPENDING)) {
 			
@@ -135,7 +137,7 @@ public class PlayerEvents implements Listener {
 				
 				chungaloid.setInvulnerable(true); // allows the item to land on the ground, and then runs forfeit
 				chungaloid.setPickupDelay(30);
-				simpage.forfeit(simp);
+				simpage.duelLeave(simp);
 				Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(Main.plugin, new Runnable() {
 					@Override
 					public void run() {
@@ -156,7 +158,7 @@ public class PlayerEvents implements Listener {
 	public void chestBlock(InventoryOpenEvent e) { // stops players in a duel from opening inventories to get special items from.
 		Player player = (Player) e.getPlayer();
 		
-		DuelClass BlakeIsBest = DuelClass.findPlayerInDuel(player);
+		DuelClass BlakeIsBest = DuelClass.findDuel(player);
 		
 		if (BlakeIsBest != null) {
 		
@@ -175,7 +177,7 @@ public class PlayerEvents implements Listener {
 		if (e.getEntity() instanceof Player) {
 			Player player = (Player) e.getEntity();
 
-			DuelClass BlakeIsBest = DuelClass.findPlayerInDuel(player);
+			DuelClass BlakeIsBest = DuelClass.findDuel(player);
 			
 			if (BlakeIsBest != null) {
 				if (BlakeIsBest.getState() == States.INBATTLE || BlakeIsBest.getState() == States.BATTLEPENDING) {
@@ -191,12 +193,12 @@ public class PlayerEvents implements Listener {
 		if (e.getEntity() instanceof Player) {
 			Player player = (Player) e.getEntity();
 			
-			DuelClass BlakeIsBest = DuelClass.findPlayerInDuel(player);
+			DuelClass BlakeIsBest = DuelClass.findDuel(player);
 			
 			if (BlakeIsBest != null) {
 			
 				if (BlakeIsBest.getState() == States.INBATTLE || BlakeIsBest.getState() == States.BATTLEPENDING) {
-					BlakeIsBest.endDuel(DuelClass.findOpponent(player));
+					BlakeIsBest.duelLeave(player);
 					e.setKeepInventory(true);
 				}
 			}
@@ -207,7 +209,7 @@ public class PlayerEvents implements Listener {
 	public void breakProtIV(BlockBreakEvent e) { // stops players in a duel from breaking blocks
 		Player player = e.getPlayer();
 		
-		DuelClass BlakeIsBest = DuelClass.findPlayerInDuel(player);
+		DuelClass BlakeIsBest = DuelClass.findDuel(player);
 		
 		if (BlakeIsBest != null) {
 			if (BlakeIsBest.getState() == States.INBATTLE || BlakeIsBest.getState() == States.BATTLEPENDING) {
@@ -220,13 +222,28 @@ public class PlayerEvents implements Listener {
 	public void interdimensionBlock(PlayerMoveEvent e) { // cancels the duel if one person goes into another dimension / hub 
 		Player player = e.getPlayer();
 		
-		DuelClass BlakeIsBest = DuelClass.findPlayerInDuel(player);
+		DuelClass BlakeIsBest = DuelClass.findDuel(player);
 		
 		if (BlakeIsBest != null) {
 			
-			if (player.getLocation().getWorld() != DuelClass.findOpponent(player).getWorld()) {
-				BlakeIsBest.stopDuel();
-				player.sendMessage("§6Wait until you're finished fighting before you do that :)");
+			if (player.getLocation().getWorld() != BlakeIsBest.getWorld()) {
+				BlakeIsBest.duelLeave(player);
+				player.sendMessage("§6You have left the §cDuel §6 becuause you entered a different world!");
+			}
+		}
+	}
+	
+	@EventHandler
+	public void creativeModeGamg(PlayerGameModeChangeEvent e) { // kicks the player from the duel if they exit survival mode
+		Player player = e.getPlayer();
+		
+		DuelClass BlakeIsBest = DuelClass.findDuel(player);
+		
+		if (BlakeIsBest != null) {
+			
+			if (e.getNewGameMode() != GameMode.SURVIVAL && player.getGameMode() != GameMode.SURVIVAL) {
+				BlakeIsBest.duelLeave(player);
+				player.sendMessage("§6You have left the §cDuel §6 becuause you changed your gamemode!");
 			}
 		}
 	}
