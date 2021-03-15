@@ -10,13 +10,7 @@ import net.pgfmc.duel.events.PlayerEvents;
 
 public class Main extends JavaPlugin {
 	
-	
-	
-	
 	public static Main plugin;
-	
-	
-	
 	
 	public void onEnable() {
 		//this.getCommand("duelStart").setExecutor(new CommandDuel()); // command loading
