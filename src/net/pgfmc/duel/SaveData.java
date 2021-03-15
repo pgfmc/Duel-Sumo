@@ -14,14 +14,14 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 
+import net.pgfmc.duel.events.DuelClass;
+
 public class SaveData {
-	
-	static File file1 = new File(Main.plugin.getDataFolder() + File.separator + "database.yml"); // Creates a File object
-	static FileConfiguration database1 = YamlConfiguration.loadConfiguration(file1); // Turns the File object into YAML and loads data
 	
 	public static void save(Player uuid) {
 		
-		
+		File file1 = new File(Main.plugin.getDataFolder() + File.separator + DuelClass.findDuel(uuid).getTXT() + ".yml"); // Creates a File object
+		FileConfiguration database1 = YamlConfiguration.loadConfiguration(file1); // Turns the File object into YAML and loads data
 		
 		PlayerInventory PI = uuid.getInventory();
 		
@@ -56,7 +56,6 @@ public class SaveData {
 			database1.set(uuid.getUniqueId() + String.valueOf(recursion), Sitem); // sets recursion value (inventory spot) to the ItemStack
 			
 			recursion += 1; // goes to the next index
-			
 		}
 		
 		try {
@@ -75,6 +74,9 @@ public class SaveData {
 	}
 	
 	public static void loadPlayer(Player gamer) { // -------------------- !-- LOAD DATA --! loads and gets inventory 
+		
+		File file1 = new File(Main.plugin.getDataFolder() + File.separator + DuelClass.findDuel(gamer).getTXT() + ".yml"); // Creates a File object
+		FileConfiguration database1 = YamlConfiguration.loadConfiguration(file1); // Turns the File object into YAML and loads data
 		
 		if (!file1.exists()) // If the file doesn't exist, create one
 		{
@@ -108,7 +110,6 @@ public class SaveData {
 					
 					
 					recursion += 1; // next index
-				
 				}
 				
 			} catch (FileNotFoundException e) {
@@ -126,9 +127,9 @@ public class SaveData {
 	
 	public static void loadout(Player gamer) { // -------------------- !-- LOAD DATA --! 
 		
-		File file2 = new File(Main.plugin.getDataFolder() + File.separator + "loadout.yml"); // Creates a File object
-		FileConfiguration database2 = YamlConfiguration.loadConfiguration(file1); // Turns the File object into YAML and loads data
-		
+		File file1 = new File(Main.plugin.getDataFolder() + File.separator + DuelClass.findDuel(gamer).getTXT() + ".yml"); // Creates a File object
+		File file2 = new File(Main.plugin.getDataFolder() + File.separator + "loadout.yml"); // ----------------------------- Creates a File object
+		FileConfiguration database2 = YamlConfiguration.loadConfiguration(file1); // ---------------------------------------- Turns the File object into YAML and loads data
 		
 		if (!file2.exists()) // If the file doesn't exist, create one
 		{
@@ -174,6 +175,9 @@ public class SaveData {
 	
 	public static void Scoreboard(OfflinePlayer gamer) { // -------------------- !-- LOAD DATA --! 
 		
+		File file1 = new File(Main.plugin.getDataFolder() + File.separator + "database.yml"); // Creates a File object
+		FileConfiguration database1 = YamlConfiguration.loadConfiguration(file1); // Turns the File object into YAML and loads data
+		
 		if (!file1.exists()) // If the file doesn't exist, create one
 		{
 			try {
@@ -217,6 +221,9 @@ public class SaveData {
 	}
 	
 	public static void getScore(Player sender, boolean wins) { // -------------------- !-- LOAD DATA --! 
+		
+		File file1 = new File(Main.plugin.getDataFolder() + File.separator + "database.yml"); // Creates a File object
+		FileConfiguration database1 = YamlConfiguration.loadConfiguration(file1); // Turns the File object into YAML and loads data
 		
 		if (!file1.exists()) // If the file doesn't exist, create one
 		{

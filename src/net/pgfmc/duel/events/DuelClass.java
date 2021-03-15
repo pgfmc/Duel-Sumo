@@ -1,5 +1,6 @@
 package net.pgfmc.duel.events;
 
+import java.time.Clock;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
@@ -21,6 +22,8 @@ public class DuelClass {
 	
 	private Set<PlayerState> Players = new HashSet<PlayerState>();
 	
+	private String time;
+	
 	public enum States { // state enumeration
 		REQUESTPENDING,
 		BATTLEPENDING,
@@ -37,6 +40,7 @@ public class DuelClass {
 		provoker = null;
 		acceptor = null;
 		world = null;
+		time = null;
 		
 		if (DuelClass.findDuel(PR) == null && DuelClass.findDuel(CH) == null) { // only create the class if there is no instances of the players in any other class
 			
@@ -45,6 +49,7 @@ public class DuelClass {
 			provoker = PR;
 			acceptor = CH;
 			world = PR.getWorld();
+			time = Clock.systemUTC().toString();
 			
 			Players.add(new PlayerState(PR));
 			
@@ -278,5 +283,9 @@ public class DuelClass {
             	
             }
         }, 20 * 10);
+	}
+
+	public String getTXT() {
+		return time;
 	}
 }
