@@ -65,14 +65,12 @@ public class DuelClass {
 	
 	public static DuelClass findDuel(Player player) { // returns the duel that that player is currently dueling in
 		
-		for (Object animemomnets : instances.toArray()) {
+		for (DuelClass animemomnets : instances) {
 			
-			DuelClass weebmomnets = (DuelClass) animemomnets;
-			
-			for (Object planar : weebmomnets.getPlayers().toArray()) {
+			for (PlayerState planar : animemomnets.getPlayers()) {
 				
-				if (((PlayerState) (planar)).getPlayer() == player) {
-					return(weebmomnets);
+				if (planar.getPlayer() == player) {
+					return(animemomnets);
 				}
 			}
 		}
@@ -81,9 +79,9 @@ public class DuelClass {
 	
 	public PlayerState findStateInDuel(Player player) { // returns the duel that that player is currently dueling in
 		
-		for (Object planar : this.getPlayers().toArray())
-			if (((PlayerState) planar).getPlayer() == player) {
-				return (PlayerState) (planar);
+		for (PlayerState planar : this.getPlayers())
+			if (planar.getPlayer() == player) {
+				return planar;
 			}
 			
 		return(null);
@@ -242,40 +240,36 @@ public class DuelClass {
 		
 		if (HELLOGAMERS.size() == 1) {
 			
-			for (PlayerState planar : HELLOGAMERS) {
-				if (planar.getPlayer() != simp) {
-					endDuel(planar.getPlayer());
-				}
-			}
+			Player Winner = HELLOGAMERS.get(0).getPlayer();
+			
+			Winner.setHealth(20.0);
+			SaveData.loadPlayer(Winner); // loads inventory and saves scores
+			SaveData.Scoreboard(Winner);
+			
+			Bukkit.broadcastMessage(Winner.getDisplayName() + " §6 has won the §cDuel!!");
+			
+			duel.setState(States.TIMEOUT);
+			
+			Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(Main.plugin, new Runnable() {
+	            
+	            @Override
+	            public void run()
+	            {
+	            	instances.remove(duel);
+	            	
+	            	for (PlayerState gaymerASMR : Players) {
+	            		gaymerASMR.remove();
+	            	}
+	            	
+	            }
+	        }, 20 * 10);
+			
 		}
 	}
 	
 	public void endDuel(Player Winner) { // ends the duel, and restores health
 		
-		DuelClass duel = this;
 		
-		Winner.setHealth(20.0);
-		
-		Bukkit.broadcastMessage(Winner.getDisplayName() + " §6 has won the §cDuel!!");
-		
-		duel.setState(States.TIMEOUT);
-		
-		SaveData.loadPlayer(Winner); // loads inventory and saves scores
-		SaveData.Scoreboard(Winner);
-		
-		Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(Main.plugin, new Runnable() {
-            
-            @Override
-            public void run()
-            {
-            	instances.remove(duel);
-            	
-            	for (PlayerState gaymerASMR : Players) {
-            		gaymerASMR.remove();
-            	}
-            	
-            }
-        }, 20 * 10);
 	}
 
 	public String getTXT() {
