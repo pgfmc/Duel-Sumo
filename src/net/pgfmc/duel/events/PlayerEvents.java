@@ -14,9 +14,9 @@ import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.inventory.InventoryType;
+import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerGameModeChangeEvent;
-import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
 import net.pgfmc.duel.Main;
@@ -72,8 +72,15 @@ public class PlayerEvents implements Listener {
 					
 					Bukkit.broadcastMessage("NULL / DEF");
 					
-					DEF.duelStart(attacker);
+					if (DEF.getState() == States.INBATTLE && DEF.findStateInDuel(target).getState() == PlayerState.States.DUELING) {
+						DEF.duelStart(attacker);
+						
+						Bukkit.broadcastMessage("LETS GO");
+						
+					}
 					return;
+					
+						
 					
 				} else if (ATK != null && DEF != null) { // if attacker and target are in a duel
 					
@@ -89,6 +96,7 @@ public class PlayerEvents implements Listener {
 							if (e.getFinalDamage() >= target.getHealth()) { // sets damage to 0 if they otherwise would've died, and kicks them from the duel
 								e.setDamage(0);
 								DEF.duelLeave(target);
+								e.setCancelled(false);
 								
 								return;
 							} else {
@@ -155,7 +163,7 @@ public class PlayerEvents implements Listener {
 			if (chungaloid.getItemStack().getType() == Material.IRON_SWORD) {
 				
 				chungaloid.setInvulnerable(true); // allows the item to land on the ground, and then runs forfeit
-				chungaloid.setPickupDelay(30);
+				chungaloid.setPickupDelay(40);
 				simpage.duelLeave(simp);
 				Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(Main.plugin, new Runnable() {
 					@Override
@@ -233,12 +241,13 @@ public class PlayerEvents implements Listener {
 		if (BlakeIsBest != null) {
 			if (BlakeIsBest.getState() == States.INBATTLE || BlakeIsBest.getState() == States.BATTLEPENDING) {
 				player.sendMessage("§6Wait until you're finished fighting before you do that :)");
+				e.setCancelled(true);
 			}
 		}
 	}
 	
 	@EventHandler
-	public void interdimensionBlock(PlayerMoveEvent e) { // cancels the duel if one person goes into another dimension / hub 
+	public void interdimensionBlock(PlayerChangedWorldEvent e) { // cancels the duel if one person goes into another dimension / hub 
 		Player player = e.getPlayer();
 		
 		DuelClass BlakeIsBest = DuelClass.findDuel(player);

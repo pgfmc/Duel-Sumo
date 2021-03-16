@@ -108,7 +108,7 @@ public class DuelClass {
 	}
 	
 	public static void duelRequest(Player attacker, Player target) { // ----------------------------------------------------------------- Duel Requester
-		attacker.sendRawMessage("§cDuel §6Request sent! Request will expire in 60 seconds."); //  sent to the sender
+		attacker.sendRawMessage("§cDuel §6Request sent! Request will expire in 15 seconds."); //  sent to the sender
 		target.sendRawMessage(attacker.getDisplayName() + " §6has Challenged you to a §cDuel!!"); // message sent to the target
 		target.sendRawMessage("§6To accept the Challenge, hit them back!");
 		target.sendRawMessage("§6The Challenge will expire in 60 seconds.");
@@ -155,9 +155,12 @@ public class DuelClass {
 	
 	public void duelStart(Player player) { //starts the duel for each player
 		
+		Players.add(new PlayerState(player));
+		
 		Bukkit.broadcastMessage("duelStart " + player.getName());
 		
 		PlayerState plr = findStateInDuel(player); // basic setup functions for the beginning of a duel :-)
+		
 		
 		player.setHealth(20.0); // -------------------sets health to full, restores all hunger, and increases saturation
 		player.setFoodLevel(20);
