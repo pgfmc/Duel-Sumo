@@ -31,31 +31,29 @@ public class DuelClass {
 		TIMEOUT
 	}
 	
-	private States state = States.REQUESTPENDING;
+	private States state;
 	
-	private static ArrayList<DuelClass> totalObj = new ArrayList<>();
+	private static Set<DuelClass> instances = new HashSet<>();
 	
 	public DuelClass(Player PR, Player CH) {
 		
-		provoker = null;
-		acceptor = null;
-		world = null;
-		time = null;
+		provoker = PR;
+		acceptor = CH;
+		world = PR.getWorld();
+		time = Clock.systemUTC().toString();
 		
-		if (DuelClass.findDuel(PR) == null && DuelClass.findDuel(CH) == null) { // only create the class if there is no instances of the players in any other class
-			
-			totalObj.add(this);
-			
-			provoker = PR;
-			acceptor = CH;
-			world = PR.getWorld();
-			time = Clock.systemUTC().toString();
-			
-			Players.add(new PlayerState(PR));
-			
-			Players.add(new PlayerState(CH));
-		}
+		Players.add(new PlayerState(PR));
+		Players.add(new PlayerState(CH));
+		
+		state = States.REQUESTPENDING;
+		
+		Bukkit.broadcastMessage("DUELCLASS INSTANCE CREATED");
+		Bukkit.broadcastMessage("PROVOKER " + PR.getName());
+		Bukkit.broadcastMessage("ACCEPTOR " + CH.getName());
+		Bukkit.broadcastMessage(instances.toString());
+		
 	}
+	
 	
 	public States getState() { // returns the state of the duel
 		return(state);
@@ -66,42 +64,38 @@ public class DuelClass {
 	}
 	
 	public static DuelClass findDuel(Player player) { // returns the duel that that player is currently dueling in
-		for (DuelClass animemomnets : totalObj) {
-			for (PlayerState planar : animemomnets.getPlayers())
-				if (planar.getPlayer() == player && animemomnets.getState() != States.REQUESTPENDING) {
-					return(animemomnets);
+		
+		for (Object animemomnets : instances.toArray()) {
+			
+			DuelClass weebmomnets = (DuelClass) animemomnets;
+			
+			for (Object planar : weebmomnets.getPlayers().toArray()) {
+				
+				if (((PlayerState) (planar)).getPlayer() == player && weebmomnets.getState() == States.REQUESTPENDING) {
+					return(weebmomnets);
 				}
 			}
-		return(null);
+		}
+		return null;
 	}
 	
 	public PlayerState findStateInDuel(Player player) { // returns the duel that that player is currently dueling in
 		
-		for (PlayerState planar : this.getPlayers())
-			if (planar.getPlayer() == player && this.getState() != States.REQUESTPENDING) {
-				return(planar);
+		for (Object planar : this.getPlayers().toArray())
+			if (((PlayerState) planar).getPlayer() == player) {
+				return (PlayerState) (planar);
 			}
 			
 		return(null);
 	}
 	
 	public boolean isProvoker(Player player) {
-		for (DuelClass animemomnets : totalObj) {
-			if (animemomnets.getProvoker() == player) {
-				return(true);
-			} else if (animemomnets.getChallenger() == player) {
-				return(false);
-			}
-		}
-		return false;
-	}
-	
-	private Player getProvoker() {
-		return(provoker);
-	}
-	
-	private Player getChallenger() {
-		return(acceptor);
+		
+		if (provoker == player) {
+			return(true);
+			
+		} else { return(false); }
+		
 	}
 	
 	public Set<PlayerState> getPlayers() {
@@ -120,6 +114,7 @@ public class DuelClass {
 		target.sendRawMessage("§6The Challenge will expire in 60 seconds.");
 		
 		DuelClass Grequest = new DuelClass(attacker, target); // ----------------------------------- creates a new Duel instance
+		instances.add(Grequest);
 		
 		Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(Main.plugin, new Runnable() {
             
@@ -128,12 +123,12 @@ public class DuelClass {
             {
             	if (Grequest.getState() == States.REQUESTPENDING) {
             		
-            		totalObj.remove(Grequest);
+            		instances.remove(Grequest);
             		
             		attacker.sendRawMessage("§6The Challenge has expired!");
             	}
             }
-        }, 1200);
+        }, 300);
 	}
 	
 	public void duelAccept() { // Duel Acceptor
@@ -148,6 +143,7 @@ public class DuelClass {
 		DuelClass billNye = this; // ---------------disables attack damage
 		billNye.setState(States.BATTLEPENDING);
 		
+		Bukkit.broadcastMessage("duelAccept RAN");
 		
 		Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(Main.plugin, new Runnable() {
 			@Override
@@ -159,6 +155,8 @@ public class DuelClass {
 	
 	public void duelStart(Player player) { //starts the duel for each player
 		
+		Bukkit.broadcastMessage("duelStart " + player.getName());
+		
 		PlayerState plr = findStateInDuel(player); // basic setup functions for the beginning of a duel :-)
 		
 		player.setHealth(20.0); // -------------------sets health to full, restores all hunger, and increases saturation
@@ -169,6 +167,8 @@ public class DuelClass {
 		SaveData.loadout(player);
 		
 		plr.setState(PlayerState.States.JOINING);
+		
+		Bukkit.broadcastMessage("JOINING lol");
 		
 		player.sendTitle("§c3", "", 2, 16, 2); // ------------------------------------------------------- onscreen animations and countdown
 		Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(Main.plugin, new Runnable() {
@@ -184,6 +184,8 @@ public class DuelClass {
         					public void run() {
         						player.sendTitle("§6D    U    E    L    !", "", 0, 20, 4);
         						plr.setState(PlayerState.States.DUELING); // ------------------------------------------ allows player to start dueling
+        						
+        						Bukkit.broadcastMessage("DUELING lol");
         						
         						Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(Main.plugin, new Runnable() {
                 					@Override
@@ -217,18 +219,6 @@ public class DuelClass {
 		}, 20);
 	}
 	
-	/*public void forfeit(Player simp) { // handles forfeits
-		
-		DuelClass simpage = DuelClass.findDuel(simp);
-		
-		if (simpage.getState() != States.REQUESTPENDING) {
-			
-    		Bukkit.broadcastMessage(simp.getPlayer().getDisplayName() + " §6has forfeit the §cDuel!"); // notification message to all players ...
-    		
-    		duelLeave(simp); // calls endDuel function
-		}
-	}*/
-	
 	public void duelLeave(Player simp) { // ends a player's time to duel (does NOT remove them from the DuelClass instance, and will not be able to rejoin OR enter a new duel until the old one is over)
 		
 		DuelClass duel = this;
@@ -239,11 +229,11 @@ public class DuelClass {
 		
 		duel.findStateInDuel(simp).setState(PlayerState.States.KILLED);
 		
-		Set<PlayerState> HELLOGAMERS = new HashSet<>();
+		ArrayList<PlayerState> HELLOGAMERS = new ArrayList<>();
 		
-		for (PlayerState planar : duel.getPlayers()) {
-			if (planar.getState() != PlayerState.States.KILLED) {
-				HELLOGAMERS.add(planar);
+		for (Object planar : duel.getPlayers().toArray()) {
+			if (((PlayerState) planar).getState() != PlayerState.States.KILLED) {
+				HELLOGAMERS.add((PlayerState) planar);
 			}
 		}
 		
@@ -275,7 +265,7 @@ public class DuelClass {
             @Override
             public void run()
             {
-            	totalObj.remove(duel);
+            	instances.remove(duel);
             	
             	for (PlayerState gaymerASMR : Players) {
             		gaymerASMR.remove();

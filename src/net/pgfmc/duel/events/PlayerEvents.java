@@ -40,56 +40,75 @@ public class PlayerEvents implements Listener {
 			
 			if (target.getGameMode() == GameMode.SURVIVAL && attacker.getGameMode() == GameMode.SURVIVAL) { // makes sure both players are in survival
 				
+				e.setCancelled(true);
 				
 				
 				DuelClass ATK = DuelClass.findDuel(attacker);
 				DuelClass DEF = DuelClass.findDuel(target);
 				
-				if (ATK == null && DEF == null) { // if neither are in a duel
+				if (ATK == null && DEF == null) { // if neither are in a duel #nullcheque
+					
+					Bukkit.broadcastMessage("NULL / NULL");
 					
 					if (isHoldingSword(attacker)) {
 						DuelClass.duelRequest(attacker, target);
-						e.setCancelled(true);
+						
+						Bukkit.broadcastMessage("REQUEST SENT");
+						/**/
+						return;
 						
 					} else {
 						attacker.sendMessage("§6Hit them with your sword if you want to §cDuel §6them!");
-						e.setCancelled(true);
+						return;
 					}
 						
 				} else if (ATK != null && DEF == null) { // if attacker is in a duel, and not the target
-					e.setCancelled(true);
+					
+					Bukkit.broadcastMessage("ATK / NULL");
+					return;
+					
 	
 				} else if (ATK == null && DEF != null) { // if attacker isnt in a duel, but the target is
 					
-					if (DEF.findStateInDuel(target).getState() != PlayerState.States.KILLED) { 
-						DEF.duelStart(attacker);
-						e.setCancelled(true);
-					}
+					Bukkit.broadcastMessage("NULL / DEF");
+					
+					DEF.duelStart(attacker);
+					return;
 					
 				} else if (ATK != null && DEF != null) { // if attacker and target are in a duel
+					
+					Bukkit.broadcastMessage("ATK / DEF");
 					
 					if (ATK == DEF) {
 						
 						if (DEF.getState() == States.INBATTLE && DEF.findStateInDuel(attacker).getState() == PlayerState.States.DUELING && DEF.findStateInDuel(target).getState() == PlayerState.States.DUELING) { // ------ if IN BATTLE stage
-						
-							if (e.getFinalDamage() > target.getHealth()) { // sets damage to 0 if they otherwise would've died, and kicks them from the duel
+							
+							Bukkit.broadcastMessage("ATTACK SENT THROUGH!");
+							
+							
+							if (e.getFinalDamage() >= target.getHealth()) { // sets damage to 0 if they otherwise would've died, and kicks them from the duel
 								e.setDamage(0);
 								DEF.duelLeave(target);
+								
+								return;
 							} else {
 								e.setCancelled(false);
+								return;
 							}
 							
 						} else if (DEF.getState() == States.BATTLEPENDING || DEF.getState() == States.TIMEOUT) {
-							e.setCancelled(true);
 							
-						} else if (DEF.getState() == States.REQUESTPENDING && DEF.isProvoker(target)){
+							Bukkit.broadcastMessage("BATTLEPENDING / TIMEOUT");
+							return;
+							
+						} else if (DEF.getState() == States.REQUESTPENDING && DEF.isProvoker(target) && DEF.findStateInDuel(attacker).getState() == PlayerState.States.PENDING && DEF.findStateInDuel(target).getState() == PlayerState.States.PENDING) {
 							DEF.duelAccept();
-							e.setCancelled(true);
+							return;
 						}
 					}
 					else {
 						attacker.sendMessage("§6They are in another §cDuel§6! You can't hit them!");
-						e.setCancelled(true);
+						return;
 					}
 				}
 			}

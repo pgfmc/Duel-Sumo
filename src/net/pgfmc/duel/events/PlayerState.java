@@ -10,12 +10,13 @@ public class PlayerState {
 	private final Player player;
 	
 	public enum States {
+		PENDING,
 		JOINING,
 		DUELING,
 		KILLED
 	}
 	
-	private States playerState = States.JOINING;
+	private States playerState;
 	
 	private static Set<PlayerState> playerStates = new HashSet<>();
 	
@@ -25,7 +26,9 @@ public class PlayerState {
 	
 	public PlayerState(Player player1) { // constructor
 		
-		this.player = player1;
+		player = player1;
+		playerState = States.PENDING;
+		
 	}
 	
 	public void setState(States state) {

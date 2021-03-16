@@ -23,4 +23,9 @@ public class Main extends JavaPlugin {
 		
 		plugin = this;
 	}
+	
+	
+	public void onDisable() {
+		
+	}
 }
