@@ -71,7 +71,7 @@ public class DuelClass {
 			
 			for (Object planar : weebmomnets.getPlayers().toArray()) {
 				
-				if (((PlayerState) (planar)).getPlayer() == player && weebmomnets.getState() == States.REQUESTPENDING) {
+				if (((PlayerState) (planar)).getPlayer() == player) {
 					return(weebmomnets);
 				}
 			}
