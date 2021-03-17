@@ -23,9 +23,14 @@ public class Main extends JavaPlugin {
 		
 		plugin = this;
 	}
-	
-	
-	public void onDisable() {
-		
-	}
 }
+
+
+
+
+
+
+
+// players are still restricted on certain things after they die in a duel
+
+// duel ending doesn't work right at all

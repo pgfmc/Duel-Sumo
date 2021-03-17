@@ -153,12 +153,14 @@ public class DuelClass {
 	
 	public void duelStart(Player player) { //starts the duel for each player
 		
-		Players.add(new PlayerState(player));
-		
 		Bukkit.broadcastMessage("duelStart " + player.getName());
 		
 		PlayerState plr = findStateInDuel(player); // basic setup functions for the beginning of a duel :-)
 		
+		if (plr == null) {
+			Players.add(new PlayerState(player));
+			plr = findStateInDuel(player);
+		}
 		
 		player.setHealth(20.0); // -------------------sets health to full, restores all hunger, and increases saturation
 		player.setFoodLevel(20);
@@ -184,7 +186,7 @@ public class DuelClass {
         					@Override
         					public void run() {
         						player.sendTitle("§6D    U    E    L    !", "", 0, 20, 4);
-        						plr.setState(PlayerState.States.DUELING); // ------------------------------------------ allows player to start dueling
+        						findStateInDuel(player).setState(PlayerState.States.DUELING); // ------------------------------------------ allows player to start dueling
         						
         						Bukkit.broadcastMessage("DUELING lol");
         						
@@ -223,22 +225,25 @@ public class DuelClass {
 	public void duelLeave(Player simp) { // ends a player's time to duel (does NOT remove them from the DuelClass instance, and will not be able to rejoin OR enter a new duel until the old one is over)
 		
 		DuelClass duel = this;
-		
 		simp.setHealth(20.0);
-		
 		SaveData.loadPlayer(simp);
-		
 		duel.findStateInDuel(simp).setState(PlayerState.States.KILLED);
 		
 		ArrayList<PlayerState> HELLOGAMERS = new ArrayList<>();
 		
-		for (Object planar : duel.getPlayers().toArray()) {
-			if (((PlayerState) planar).getState() != PlayerState.States.KILLED) {
-				HELLOGAMERS.add((PlayerState) planar);
+		Bukkit.broadcastMessage(duel.getPlayers().toString());
+		
+		for (PlayerState planar : duel.getPlayers()) {
+			
+			Bukkit.broadcastMessage(planar.getState().toString());
+			if (planar.getState() != PlayerState.States.KILLED) {
+				
+				
+				HELLOGAMERS.add(planar);
 			}
 		}
 		
-		if (HELLOGAMERS.size() == 1) {
+		if (HELLOGAMERS.size() == 1) { // if there is only one person left alive
 			
 			Player Winner = HELLOGAMERS.get(0).getPlayer();
 			
@@ -260,16 +265,16 @@ public class DuelClass {
 	            	for (PlayerState gaymerASMR : Players) {
 	            		gaymerASMR.remove();
 	            	}
-	            	
 	            }
-	        }, 20 * 10);
-			
+	        }, 200);
 		}
 	}
 	
-	public void endDuel(Player Winner) { // ends the duel, and restores health
+	public void duelKick(Player player) { // ends the duel, and restores health
 		
-		
+		duelLeave(player);
+		Players.remove(DuelClass.findDuel(player).findStateInDuel(player));
+		Bukkit.broadcastMessage("Player kicked successfully");
 	}
 
 	public String getTXT() {

@@ -61,14 +61,9 @@ public class PlayerEvents implements Listener {
 						attacker.sendMessage("§6Hit them with your sword if you want to §cDuel §6them!");
 						return;
 					}
-						
-				} else if (ATK != null && DEF == null) { // if attacker is in a duel, and not the target
-					
-					Bukkit.broadcastMessage("ATK / NULL");
-					return;
 					
 	
-				} else if (ATK == null && DEF != null) { // if attacker isnt in a duel, but the target is
+				} else if (ATK == null && DEF != null && isHoldingSword(attacker)) { // if attacker isnt in a duel, but the target is
 					
 					Bukkit.broadcastMessage("NULL / DEF");
 					
@@ -79,8 +74,6 @@ public class PlayerEvents implements Listener {
 						
 					}
 					return;
-					
-						
 					
 				} else if (ATK != null && DEF != null) { // if attacker and target are in a duel
 					
@@ -94,9 +87,9 @@ public class PlayerEvents implements Listener {
 							
 							
 							if (e.getFinalDamage() >= target.getHealth()) { // sets damage to 0 if they otherwise would've died, and kicks them from the duel
+								e.setCancelled(false);
 								e.setDamage(0);
 								DEF.duelLeave(target);
-								e.setCancelled(false);
 								
 								return;
 							} else {
@@ -146,7 +139,7 @@ public class PlayerEvents implements Listener {
 		
 		if (gimmer != null) { // --------------------------- checks if the player is in a duel
 
-			gimmer.duelLeave(simp);
+			gimmer.duelKick(simp);
 		}
 	}
 	
