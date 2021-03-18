@@ -114,7 +114,8 @@ public class PlayerEvents implements Listener {
 		}
 	}
 	
-	@EventHandler
+	@Deprecated
+	//@EventHandler
 	public void noDamage(EntityDamageEvent e) { // --------------------- disables certain kinds of damage only if they are in a duel
 		
 		if (e.getEntity() instanceof Player) {
@@ -141,7 +142,8 @@ public class PlayerEvents implements Listener {
 		}
 	}
 	
-	@EventHandler
+	@Deprecated
+	//@EventHandler
 	public void dropsItem(PlayerDropItemEvent e) { //when someone drops an item in battle
 		Player simp = e.getPlayer();
 		Item chungaloid = e.getItemDrop();
@@ -172,7 +174,8 @@ public class PlayerEvents implements Listener {
 		}
 	}
 	
-	@EventHandler
+	@Deprecated
+	//@EventHandler
 	public void chestBlock(InventoryOpenEvent e) { // stops players in a duel from opening inventories to get special items from.
 		Player player = (Player) e.getPlayer();
 		
@@ -189,7 +192,8 @@ public class PlayerEvents implements Listener {
 		}
 	}
 	
-	@EventHandler
+	@Deprecated
+	//@EventHandler
 	public void itemBlock(EntityPickupItemEvent e) { // doesn't allow items to be picked up while in a duel
 
 		if (e.getEntity() instanceof Player) {
@@ -223,7 +227,8 @@ public class PlayerEvents implements Listener {
 		}
 	}
 	
-	@EventHandler
+	@Deprecated
+	//@EventHandler
 	public void breakProtIV(BlockBreakEvent e) { // stops players in a duel from breaking blocks
 		Player player = e.getPlayer();
 		
