@@ -18,6 +18,7 @@ import net.pgfmc.duel.events.DuelClass;
 
 public class SaveData {
 	
+	@Deprecated
 	public static void save(Player uuid) {
 		
 		File file1 = new File(Main.plugin.getDataFolder() + File.separator + DuelClass.findDuel(uuid).getTXT() + ".yml"); // Creates a File object
@@ -73,6 +74,7 @@ public class SaveData {
 		}
 	}
 	
+	@Deprecated
 	public static void loadPlayer(Player gamer) { // -------------------- !-- LOAD DATA --! loads and gets inventory 
 		
 		File file1 = new File(Main.plugin.getDataFolder() + File.separator + DuelClass.findDuel(gamer).getTXT() + ".yml"); // Creates a File object
@@ -125,6 +127,7 @@ public class SaveData {
 		}
 	}
 	
+	@Deprecated
 	public static void loadout(Player gamer) { // -------------------- !-- LOAD DATA --! 
 		
 		File file1 = new File(Main.plugin.getDataFolder() + File.separator + DuelClass.findDuel(gamer).getTXT() + ".yml"); // Creates a File object

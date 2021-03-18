@@ -4,6 +4,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.entity.Item;
+import org.bukkit.entity.Monster;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -11,6 +12,7 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityPickupItemEvent;
+import org.bukkit.event.entity.EntityTargetLivingEntityEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.inventory.InventoryType;
@@ -47,14 +49,9 @@ public class PlayerEvents implements Listener {
 				DuelClass DEF = DuelClass.findDuel(target);
 				
 				if (ATK == null && DEF == null) { // if neither are in a duel #nullcheque
-					
-					Bukkit.broadcastMessage("NULL / NULL");
-					
+
 					if (isHoldingSword(attacker)) {
 						DuelClass.duelRequest(attacker, target);
-						
-						Bukkit.broadcastMessage("REQUEST SENT");
-						/**/
 						return;
 						
 					} else {
@@ -64,53 +61,54 @@ public class PlayerEvents implements Listener {
 					
 	
 				} else if (ATK == null && DEF != null && isHoldingSword(attacker)) { // if attacker isnt in a duel, but the target is
-					
-					Bukkit.broadcastMessage("NULL / DEF");
-					
+				
 					if (DEF.getState() == States.INBATTLE && DEF.findStateInDuel(target).getState() == PlayerState.States.DUELING) {
 						DEF.duelStart(attacker);
-						
-						Bukkit.broadcastMessage("LETS GO");
 						
 					}
 					return;
 					
 				} else if (ATK != null && DEF != null) { // if attacker and target are in a duel
 					
-					Bukkit.broadcastMessage("ATK / DEF");
-					
 					if (ATK == DEF) {
 						
 						if (DEF.getState() == States.INBATTLE && DEF.findStateInDuel(attacker).getState() == PlayerState.States.DUELING && DEF.findStateInDuel(target).getState() == PlayerState.States.DUELING) { // ------ if IN BATTLE stage
 							
-							Bukkit.broadcastMessage("ATTACK SENT THROUGH!");
+							e.setCancelled(false);
+							return;
 							
 							
-							if (e.getFinalDamage() >= target.getHealth()) { // sets damage to 0 if they otherwise would've died, and kicks them from the duel
+							
+							/*if (e.getFinalDamage() >= target.getHealth()) { // sets damage to 0 if they otherwise would've died, and kicks them from the duel
 								e.setCancelled(false);
 								e.setDamage(0);
 								DEF.duelLeave(target);
 								
 								return;
 							} else {
-								e.setCancelled(false);
-								return;
-							}
-							
-						} else if (DEF.getState() == States.BATTLEPENDING || DEF.getState() == States.TIMEOUT) {
-							
-							Bukkit.broadcastMessage("BATTLEPENDING / TIMEOUT");
-							return;
+								
+							}*/
 							
 						} else if (DEF.getState() == States.REQUESTPENDING && DEF.isProvoker(target) && DEF.findStateInDuel(attacker).getState() == PlayerState.States.PENDING && DEF.findStateInDuel(target).getState() == PlayerState.States.PENDING) {
 							DEF.duelAccept();
 							return;
 						}
-					}
-					else {
+					} else {
 						attacker.sendMessage("§6They are in another §cDuel§6! You can't hit them!");
 						return;
 					}
+				}
+			}
+			
+		} else if (e.getEntity() instanceof Player && e.getDamager() instanceof Monster) { // disables attacks from monsters if the player is in a duel
+			
+			Player target = (Player) e.getDamager();
+			
+			DuelClass DEF = DuelClass.findDuel(target);
+			
+			if (DEF != null) {
+				if (DEF.findStateInDuel(target).getState() == PlayerState.States.DUELING || DEF.findStateInDuel(target).getState() == PlayerState.States.JOINING) {
+					e.setCancelled(true);
 				}
 			}
 		}
@@ -268,4 +266,40 @@ public class PlayerEvents implements Listener {
 			}
 		}
 	}
+	
+	@EventHandler
+	public void deAggro(EntityTargetLivingEntityEvent e) { // -------------- disables aggro if a mob targets a player in a duel
+	
+		if (e.getTarget() instanceof Player && e.getEntity() instanceof Monster) {
+			
+			Player player = (Player) e.getTarget();
+			
+			DuelClass BlakeIsBest = DuelClass.findDuel(player);
+			
+			if (BlakeIsBest != null) {
+				
+				if (BlakeIsBest.findStateInDuel(player).getState() == PlayerState.States.DUELING || BlakeIsBest.findStateInDuel(player).getState() == PlayerState.States.JOINING) {
+					e.setCancelled(true);
+				}
+			}
+		}
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 }

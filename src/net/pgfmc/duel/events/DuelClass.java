@@ -46,12 +46,6 @@ public class DuelClass {
 		Players.add(new PlayerState(CH));
 		
 		state = States.REQUESTPENDING;
-		
-		Bukkit.broadcastMessage("DUELCLASS INSTANCE CREATED");
-		Bukkit.broadcastMessage("PROVOKER " + PR.getName());
-		Bukkit.broadcastMessage("ACCEPTOR " + CH.getName());
-		Bukkit.broadcastMessage(instances.toString());
-		
 	}
 	
 	
@@ -141,8 +135,6 @@ public class DuelClass {
 		DuelClass billNye = this; // ---------------disables attack damage
 		billNye.setState(States.BATTLEPENDING);
 		
-		Bukkit.broadcastMessage("duelAccept RAN");
-		
 		Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(Main.plugin, new Runnable() {
 			@Override
 			public void run() {
@@ -152,8 +144,6 @@ public class DuelClass {
 	}
 	
 	public void duelStart(Player player) { //starts the duel for each player
-		
-		Bukkit.broadcastMessage("duelStart " + player.getName());
 		
 		PlayerState plr = findStateInDuel(player); // basic setup functions for the beginning of a duel :-)
 		
@@ -166,12 +156,10 @@ public class DuelClass {
 		player.setFoodLevel(20);
 		player.setSaturation(2);
 		
-		SaveData.save(player);
-		SaveData.loadout(player);
+		//SaveData.save(player);
+		//SaveData.loadout(player);
 		
 		plr.setState(PlayerState.States.JOINING);
-		
-		Bukkit.broadcastMessage("JOINING lol");
 		
 		player.sendTitle("§c3", "", 2, 16, 2); // ------------------------------------------------------- onscreen animations and countdown
 		Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(Main.plugin, new Runnable() {
@@ -185,10 +173,9 @@ public class DuelClass {
 						Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(Main.plugin, new Runnable() {
         					@Override
         					public void run() {
+        						
         						player.sendTitle("§6D    U    E    L    !", "", 0, 20, 4);
         						findStateInDuel(player).setState(PlayerState.States.DUELING); // ------------------------------------------ allows player to start dueling
-        						
-        						Bukkit.broadcastMessage("DUELING lol");
         						
         						Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(Main.plugin, new Runnable() {
                 					@Override
@@ -226,16 +213,11 @@ public class DuelClass {
 		
 		DuelClass duel = this;
 		simp.setHealth(20.0);
-		SaveData.loadPlayer(simp);
+		//SaveData.loadPlayer(simp);
 		duel.findStateInDuel(simp).setState(PlayerState.States.KILLED);
 		
 		ArrayList<PlayerState> HELLOGAMERS = new ArrayList<>();
-		
-		Bukkit.broadcastMessage(duel.getPlayers().toString());
-		
 		for (PlayerState planar : duel.getPlayers()) {
-			
-			Bukkit.broadcastMessage(planar.getState().toString());
 			if (planar.getState() != PlayerState.States.KILLED) {
 				
 				
@@ -248,7 +230,7 @@ public class DuelClass {
 			Player Winner = HELLOGAMERS.get(0).getPlayer();
 			
 			Winner.setHealth(20.0);
-			SaveData.loadPlayer(Winner); // loads inventory and saves scores
+			//SaveData.loadPlayer(Winner); // loads inventory and saves scores
 			SaveData.Scoreboard(Winner);
 			
 			Bukkit.broadcastMessage(Winner.getDisplayName() + " §6 has won the §cDuel!!");
@@ -274,7 +256,6 @@ public class DuelClass {
 		
 		duelLeave(player);
 		Players.remove(DuelClass.findDuel(player).findStateInDuel(player));
-		Bukkit.broadcastMessage("Player kicked successfully");
 	}
 
 	public String getTXT() {
