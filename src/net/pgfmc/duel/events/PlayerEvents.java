@@ -1,27 +1,19 @@
 package net.pgfmc.duel.events;
 
-import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
-import org.bukkit.entity.Item;
 import org.bukkit.entity.Monster;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.entity.EntityTargetLivingEntityEvent;
-import org.bukkit.event.entity.PlayerDeathEvent;
-import org.bukkit.event.inventory.InventoryOpenEvent;
-import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerGameModeChangeEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
-import net.pgfmc.duel.Main;
 import net.pgfmc.duel.events.DuelClass.States;
 
 public class PlayerEvents implements Listener {
@@ -76,19 +68,7 @@ public class PlayerEvents implements Listener {
 							
 							e.setCancelled(false);
 							return;
-							
-							
-							
-							/*if (e.getFinalDamage() >= target.getHealth()) { // sets damage to 0 if they otherwise would've died, and kicks them from the duel
-								e.setCancelled(false);
-								e.setDamage(0);
-								DEF.duelLeave(target);
-								
-								return;
-							} else {
-								
-							}*/
-							
+	
 						} else if (DEF.getState() == States.REQUESTPENDING && DEF.isProvoker(target) && DEF.findStateInDuel(attacker).getState() == PlayerState.States.PENDING && DEF.findStateInDuel(target).getState() == PlayerState.States.PENDING) {
 							DEF.duelAccept();
 							return;
@@ -114,16 +94,21 @@ public class PlayerEvents implements Listener {
 		}
 	}
 	
-	@Deprecated
-	//@EventHandler
-	public void noDamage(EntityDamageEvent e) { // --------------------- disables certain kinds of damage only if they are in a duel
+	@EventHandler
+	public void noDamage(EntityDamageEvent e) { // --------------------- sends a player back to their spawn point after they get defeated in a duel
 		
 		if (e.getEntity() instanceof Player) {
 			Player gamer = (Player) e.getEntity();
 			
-			if (DuelClass.findDuel(gamer) != null) {
-				if ((DuelClass.findDuel(gamer).getState() == States.BATTLEPENDING ||  DuelClass.findDuel(gamer).getState() == States.INBATTLE) && gamer.getGameMode() == GameMode.SURVIVAL) {
-					if (e.getCause() != EntityDamageEvent.DamageCause.ENTITY_ATTACK) {
+			DuelClass BlakeIsBest = DuelClass.findDuel(gamer);
+			
+			if (BlakeIsBest != null) {
+				if ((BlakeIsBest.getState() == States.BATTLEPENDING ||  BlakeIsBest.getState() == States.INBATTLE) && gamer.getGameMode() == GameMode.SURVIVAL) {
+					
+					if (e.getFinalDamage() >= gamer.getHealth()) {
+						
+						gamer.teleport(gamer.getBedSpawnLocation());
+						BlakeIsBest.duelLeave(gamer);
 						e.setCancelled(true);
 					}
 				}
@@ -137,108 +122,21 @@ public class PlayerEvents implements Listener {
 		DuelClass gimmer = DuelClass.findDuel(simp);
 		
 		if (gimmer != null) { // --------------------------- checks if the player is in a duel
-
 			gimmer.duelKick(simp);
 		}
 	}
 	
-	@Deprecated
-	//@EventHandler
-	public void dropsItem(PlayerDropItemEvent e) { //when someone drops an item in battle
-		Player simp = e.getPlayer();
-		Item chungaloid = e.getItemDrop();
-		//hashImp(simp);
-		
-		DuelClass simpage = DuelClass.findDuel(simp);
-		
-		if (simpage != null && (simpage.getState() == States.INBATTLE || simpage.getState() == States.BATTLEPENDING)) {
-			
-			if (chungaloid.getItemStack().getType() == Material.IRON_SWORD) {
-				
-				chungaloid.setInvulnerable(true); // allows the item to land on the ground, and then runs forfeit
-				chungaloid.setPickupDelay(40);
-				simpage.duelLeave(simp);
-				Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(Main.plugin, new Runnable() {
-					@Override
-					public void run() {
-						
-						chungaloid.setInvulnerable(false);
-						chungaloid.remove();
-					}
-				}, 30);
-				
-			} else {
-				simp.getInventory().setItemInMainHand(chungaloid.getItemStack()); // gives item back to the dropper, then removes the item
-				chungaloid.remove();
-			}
-		}
-	}
-	
-	@Deprecated
-	//@EventHandler
-	public void chestBlock(InventoryOpenEvent e) { // stops players in a duel from opening inventories to get special items from.
-		Player player = (Player) e.getPlayer();
-		
-		DuelClass BlakeIsBest = DuelClass.findDuel(player);
-		
-		if (BlakeIsBest != null) {
-		
-			if (BlakeIsBest.getState() == States.INBATTLE || BlakeIsBest.getState() == States.BATTLEPENDING) {
-				if (!(e.getInventory().getType() == InventoryType.PLAYER || e.getInventory().getType() == InventoryType.CRAFTING || e.getInventory().getType() == InventoryType.WORKBENCH)) {
-					e.setCancelled(true);
-					player.sendMessage("§6Wait until you're finished fighting before you do that :)");
-				}
-			}
-		}
-	}
-	
-	@Deprecated
-	//@EventHandler
-	public void itemBlock(EntityPickupItemEvent e) { // doesn't allow items to be picked up while in a duel
-
-		if (e.getEntity() instanceof Player) {
-			Player player = (Player) e.getEntity();
-
-			DuelClass BlakeIsBest = DuelClass.findDuel(player);
-			
-			if (BlakeIsBest != null) {
-				if (BlakeIsBest.getState() == States.INBATTLE || BlakeIsBest.getState() == States.BATTLEPENDING) {
-
-					e.setCancelled(true);
-				}
-			}
-		}
-	}
-	
 	@EventHandler
-	public void onDeath(PlayerDeathEvent e) { // if a player in a duel dies, they lose and their opponent wins
-		if (e.getEntity() instanceof Player) {
-			Player player = (Player) e.getEntity();
-			
-			DuelClass BlakeIsBest = DuelClass.findDuel(player);
-			
-			if (BlakeIsBest != null) {
-			
-				if (BlakeIsBest.getState() == States.INBATTLE || BlakeIsBest.getState() == States.BATTLEPENDING) {
-					BlakeIsBest.duelLeave(player);
-					e.setKeepInventory(true);
-				}
-			}
-		}
-	}
-	
-	@Deprecated
-	//@EventHandler
-	public void breakProtIV(BlockBreakEvent e) { // stops players in a duel from breaking blocks
-		Player player = e.getPlayer();
+	public void dropsItem(PlayerDropItemEvent e) { //when someone drops an item in battle
 		
-		DuelClass BlakeIsBest = DuelClass.findDuel(player);
+		Player simp = e.getPlayer();
+		DuelClass BlakeIsBest = DuelClass.findDuel(simp);
+		Material mainHand = e.getItemDrop().getItemStack().getType();
 		
-		if (BlakeIsBest != null) {
-			if (BlakeIsBest.getState() == States.INBATTLE || BlakeIsBest.getState() == States.BATTLEPENDING) {
-				player.sendMessage("§6Wait until you're finished fighting before you do that :)");
-				e.setCancelled(true);
-			}
+		if (BlakeIsBest != null && (BlakeIsBest.getState() == States.INBATTLE || BlakeIsBest.getState() == States.BATTLEPENDING) && (mainHand == Material.IRON_SWORD || mainHand == Material.DIAMOND_SWORD || mainHand == Material.GOLDEN_SWORD || mainHand == Material.STONE_SWORD || mainHand == Material.NETHERITE_SWORD || mainHand == Material.WOODEN_SWORD)) {
+			
+			e.setCancelled(true);
+			BlakeIsBest.duelLeave(simp);
 		}
 	}
 	
@@ -289,22 +187,4 @@ public class PlayerEvents implements Listener {
 			}
 		}
 	}
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
 }

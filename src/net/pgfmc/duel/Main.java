@@ -12,6 +12,8 @@ public class Main extends JavaPlugin {
 	
 	public static Main plugin;
 	
+	public static boolean debugMode;
+	
 	public void onEnable() {
 		//this.getCommand("duelStart").setExecutor(new CommandDuel()); // command loading
 		
@@ -22,14 +24,18 @@ public class Main extends JavaPlugin {
 		getServer().getPluginManager().registerEvents(new PlayerEvents(), this); // loads PlayerEvents.java
 		
 		plugin = this;
+		
+		debugMode = false;
+	}
+	
+	public static void setDebug(boolean JPmomnet) {
+		debugMode = JPmomnet;
+	}
+	
+	public static boolean getDebug() {
+		return debugMode;
 	}
 }
-
-
-
-
-
-
 
 // players are still restricted on certain things after they die in a duel
 
