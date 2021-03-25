@@ -1,7 +1,7 @@
 package net.pgfmc.duel.events;
 
-import java.time.Clock;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -22,8 +22,6 @@ public class DuelClass {
 	
 	private Set<PlayerState> Players = new HashSet<PlayerState>();
 	
-	private String time;
-	
 	public enum States { // state enumeration
 		REQUESTPENDING,
 		BATTLEPENDING,
@@ -40,11 +38,6 @@ public class DuelClass {
 		provoker = PR;
 		acceptor = CH;
 		world = PR.getWorld();
-		time = Clock.systemUTC().toString();
-		
-		Players.add(new PlayerState(PR));
-		Players.add(new PlayerState(CH));
-		
 		state = States.REQUESTPENDING;
 	}
 	
@@ -145,68 +138,65 @@ public class DuelClass {
 	
 	public void duelStart(Player player) { //starts the duel for each player
 		
-		PlayerState plr = findStateInDuel(player); // basic setup functions for the beginning of a duel :-)
+		PlayerState plr = PlayerState.getState(player); // basic setup functions for the beginning of a duel :-)
 		
-		if (plr == null) {
-			Players.add(new PlayerState(player));
-			plr = findStateInDuel(player);
-		}
+		plr.setDuel(this);
+		plr.setState(PlayerState.States.JOINING);
+		Players.add(plr);
 		
 		player.setHealth(20.0); // -------------------sets health to full, restores all hunger, and increases saturation
 		player.setFoodLevel(20);
 		player.setSaturation(2);
 		
-		//SaveData.save(player);
-		//SaveData.loadout(player);
 		
-		plr.setState(PlayerState.States.JOINING);
 		
-		player.sendTitle("§c3", "", 2, 16, 2); // ------------------------------------------------------- onscreen animations and countdown
-		Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(Main.plugin, new Runnable() {
-			@Override
-			public void run() {
-				player.sendTitle("§c2", "", 2, 16, 2);
+		for (int i = 0; i < 3;
+				
 				Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(Main.plugin, new Runnable() {
 					@Override
 					public void run() {
-						player.sendTitle("§c1", "", 2, 16, 4);
-						Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(Main.plugin, new Runnable() {
-        					@Override
-        					public void run() {
-        						
-        						player.sendTitle("§6D    U    E    L    !", "", 0, 20, 4);
-        						findStateInDuel(player).setState(PlayerState.States.DUELING); // ------------------------------------------ allows player to start dueling
-        						
-        						Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(Main.plugin, new Runnable() {
-                					@Override
-                					public void run() {
-                						player.sendTitle("§6D   U   E   L   !", "", 0, 20, 4);
-                						Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(Main.plugin, new Runnable() {
-                        					@Override
-                        					public void run() {
-                        						player.sendTitle("§6D  U  E  L  !", "", 0, 20, 4);
-                        						Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(Main.plugin, new Runnable() {
-                                					@Override
-                                					public void run() {
-                                						player.sendTitle("§6D U E L !", "", 0, 20, 4);
-                                						Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(Main.plugin, new Runnable() {
-                                        					@Override
-                                        					public void run() {
-                                        						player.sendTitle("§6DUEL!", "", 0, 20, 4);
-                                        					}
-                                        				}, 2);
-                                					}
-                                				}, 2);
-                        					}
-                        				}, 2);
-                					}
-                				}, 2);
-        					}
-        				}, 20);
+						player.sendTitle("§6DUEL!", "", 0, 20, 4);
+						
+						if (i == 0) {
+							player.sendTitle("§c2", "", 2, 16, 2);
+						} else if (i == 1) {
+							player.sendTitle("§c1", "", 2, 16, 4);
+						} else if (i == 2) {
+							player.sendTitle("§6D    U    E    L    !", "", 0, 20, 4);
+							findStateInDuel(player).setState(PlayerState.States.DUELING); // ------------------------------------------ allows player to start dueling
+						}
 					}
-				}, 20);
-			}
-		}, 20);
+				}, 20 * (i+1))
+				
+		) { // loop 
+			
+			
+			
+		}
+		
+		player.sendTitle("§c3", "", 2, 16, 2); // ------------------------------------------------------- onscreen animations and countdown
+		
+		HashMap<String, Integer> introAnimation = new HashMap<>();
+		introAnimation.put("§c2", 20);
+		introAnimation.put("§c1", 40);
+		introAnimation.put("§6D    U    E    L    !", 60);
+		introAnimation.put("§6D   U   E   L   !", 62);
+		introAnimation.put("§6D  U  E  L  !", 64);
+		introAnimation.put("§6D U E L !", 66);
+		introAnimation.put("§6DUEL!", 68);
+		
+		for (String key : introAnimation.keySet()) { // runs through the list
+			
+			Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(Main.plugin, new Runnable() {
+				@Override
+				public void run() {
+					player.sendTitle(key, "", 0, 20, 4);
+				}
+			}, introAnimation.get(key));
+		}
+		
+		
+		
 	}
 	
 	public void duelLeave(Player simp) { // ends a player's time to duel (does NOT remove them from the DuelClass instance, and will not be able to rejoin OR enter a new duel until the old one is over)
@@ -252,13 +242,9 @@ public class DuelClass {
 		}
 	}
 	
-	public void duelKick(Player player) { // ends the duel, and restores health
+	public void duelKick(PlayerState simp) { // ends the duel, and restores health
 		
-		duelLeave(player);
-		Players.remove(DuelClass.findDuel(player).findStateInDuel(player));
-	}
-
-	public String getTXT() {
-		return time;
+		duelLeave(simp.getPlayer());
+		Players.remove(simp);
 	}
 }

@@ -18,7 +18,9 @@ public class PlayerState {
 	
 	private States playerState;
 	
-	private static Set<PlayerState> playerStates = new HashSet<>();
+	private static Set<PlayerState> playerStates = new HashSet<PlayerState>();
+	
+	private DuelClass parentDuel;
 	
 	public States getState() {
 		return(playerState);
@@ -28,7 +30,8 @@ public class PlayerState {
 		
 		player = player1;
 		playerState = States.PENDING;
-		
+		playerStates.add(this);
+		parentDuel = null;
 	}
 	
 	public void setState(States state) {
@@ -39,11 +42,24 @@ public class PlayerState {
 		return player;
 	}
 	
-	public void remove() { // ------- deletes a player from existence
+	public void remove() { // ------- deletes a player from existence (lol)
+		playerStates.remove(this);
+	}
+	
+	public static PlayerState getState(Player player) {
 		for (PlayerState planar : playerStates) {
-			
-			playerStates.remove(planar);
-			planar = null;
+			if (planar.getPlayer() == player) {
+				return planar;
+			}
 		}
+		return null;
+	}
+	
+	public void setDuel(DuelClass duelClass) {
+		parentDuel = duelClass;
+	}
+	
+	public DuelClass getDuel() {
+		return parentDuel;
 	}
 }

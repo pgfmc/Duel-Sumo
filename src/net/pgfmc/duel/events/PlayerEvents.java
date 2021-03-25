@@ -12,6 +12,7 @@ import org.bukkit.event.entity.EntityTargetLivingEntityEvent;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerGameModeChangeEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
 import net.pgfmc.duel.events.DuelClass.States;
@@ -117,13 +118,15 @@ public class PlayerEvents implements Listener {
 	}
 	
 	@EventHandler
-	public void inventoryRestorerPt1(PlayerQuitEvent pQ) { // method for when a player in a duel leaves the server
-		Player simp = pQ.getPlayer();
-		DuelClass gimmer = DuelClass.findDuel(simp);
+	public void inventoryRestorerPt1(PlayerQuitEvent e) { // method for when a player in a duel leaves the server
+		
+		PlayerState simp = PlayerState.getState(e.getPlayer());
+		DuelClass gimmer = simp.getDuel();
 		
 		if (gimmer != null) { // --------------------------- checks if the player is in a duel
 			gimmer.duelKick(simp);
 		}
+		simp.remove();
 	}
 	
 	@EventHandler
@@ -186,5 +189,10 @@ public class PlayerEvents implements Listener {
 				}
 			}
 		}
+	}
+	
+	@EventHandler
+	public void onJoin(PlayerJoinEvent e) {
+		new PlayerState(e.getPlayer());
 	}
 }
