@@ -2,6 +2,8 @@ package net.pgfmc.duel;
 
 //import java.io.IOException;
 
+// Written by CrimsonDart
+
 import org.bukkit.plugin.java.JavaPlugin;
 
 import net.pgfmc.duel.commands.CommandGetLosses;
@@ -15,8 +17,6 @@ public class Main extends JavaPlugin {
 	public static boolean debugMode;
 	
 	public void onEnable() {
-		//this.getCommand("duelStart").setExecutor(new CommandDuel()); // command loading
-		
 		getCommand("Wins").setExecutor(new CommandGetWins());
 		
 		getCommand("Losses").setExecutor(new CommandGetLosses());
