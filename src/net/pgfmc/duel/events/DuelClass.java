@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 
@@ -13,6 +14,10 @@ import net.pgfmc.duel.Main;
 import net.pgfmc.duel.SaveData;
 
 public class DuelClass {
+	
+	
+	
+	
 	
 	private Player provoker;
 	
@@ -30,15 +35,25 @@ public class DuelClass {
 	}
 	
 	private States state;
+
+	public Player getProvoker() {
+		return provoker;
+	}
 	
 	private static Set<DuelClass> instances = new HashSet<>();
 	
-	public DuelClass(Player PR, Player CH) {
+	public DuelClass(PlayerState PR, PlayerState CH) {
 		
-		provoker = PR;
-		acceptor = CH;
-		world = PR.getWorld();
+		world = PR.getPlayer().getWorld();
 		state = States.REQUESTPENDING;
+		PR.setDuel(this);
+		CH.setDuel(this);
+		Players.add(PR);
+		Players.add(CH);
+		provoker = PR.getPlayer();
+		acceptor = CH.getPlayer();
+		PR.setState(PlayerState.States.PENDING);
+		CH.setState(PlayerState.States.PENDING);
 	}
 	
 	
@@ -50,20 +65,6 @@ public class DuelClass {
 		state = gimmer;
 	}
 	
-	public static DuelClass findDuel(Player player) { // returns the duel that that player is currently dueling in
-		
-		for (DuelClass animemomnets : instances) {
-			
-			for (PlayerState planar : animemomnets.getPlayers()) {
-				
-				if (planar.getPlayer() == player) {
-					return(animemomnets);
-				}
-			}
-		}
-		return null;
-	}
-	
 	public PlayerState findStateInDuel(Player player) { // returns the duel that that player is currently dueling in
 		
 		for (PlayerState planar : this.getPlayers())
@@ -72,15 +73,6 @@ public class DuelClass {
 			}
 			
 		return(null);
-	}
-	
-	public boolean isProvoker(Player player) {
-		
-		if (provoker == player) {
-			return(true);
-			
-		} else { return(false); }
-		
 	}
 	
 	public Set<PlayerState> getPlayers() {
@@ -96,9 +88,12 @@ public class DuelClass {
 		attacker.sendRawMessage("§cDuel §6Request sent! Request will expire in 15 seconds."); //  sent to the sender
 		target.sendRawMessage(attacker.getDisplayName() + " §6has Challenged you to a §cDuel!!"); // message sent to the target
 		target.sendRawMessage("§6To accept the Challenge, hit them back!");
-		target.sendRawMessage("§6The Challenge will expire in 60 seconds.");
+		target.sendRawMessage("§6The Challenge will expire in 15 seconds.");
 		
-		DuelClass Grequest = new DuelClass(attacker, target); // ----------------------------------- creates a new Duel instance
+		PlayerState Sender = PlayerState.getState(attacker);
+		PlayerState Reciever = PlayerState.getState(target);
+		
+		DuelClass Grequest = new DuelClass(Sender, Reciever); // ----------------------------------- creates a new Duel instance
 		instances.add(Grequest);
 		
 		Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(Main.plugin, new Runnable() {
@@ -109,8 +104,12 @@ public class DuelClass {
             	if (Grequest.getState() == States.REQUESTPENDING) {
             		
             		instances.remove(Grequest);
-            		
             		attacker.sendRawMessage("§6The Challenge has expired!");
+            		
+            		for (PlayerState planar : Grequest.getPlayers()) {
+            			planar.duelNull();
+            			planar.setState(PlayerState.States.INGAME);
+            		}
             	}
             }
         }, 300);
@@ -148,32 +147,6 @@ public class DuelClass {
 		player.setFoodLevel(20);
 		player.setSaturation(2);
 		
-		
-		
-		for (int i = 0; i < 3;
-				
-				Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(Main.plugin, new Runnable() {
-					@Override
-					public void run() {
-						player.sendTitle("§6DUEL!", "", 0, 20, 4);
-						
-						if (i == 0) {
-							player.sendTitle("§c2", "", 2, 16, 2);
-						} else if (i == 1) {
-							player.sendTitle("§c1", "", 2, 16, 4);
-						} else if (i == 2) {
-							player.sendTitle("§6D    U    E    L    !", "", 0, 20, 4);
-							findStateInDuel(player).setState(PlayerState.States.DUELING); // ------------------------------------------ allows player to start dueling
-						}
-					}
-				}, 20 * (i+1))
-				
-		) { // loop 
-			
-			
-			
-		}
-		
 		player.sendTitle("§c3", "", 2, 16, 2); // ------------------------------------------------------- onscreen animations and countdown
 		
 		HashMap<String, Integer> introAnimation = new HashMap<>();
@@ -190,27 +163,29 @@ public class DuelClass {
 			Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(Main.plugin, new Runnable() {
 				@Override
 				public void run() {
-					player.sendTitle(key, "", 0, 20, 4);
+					player.sendTitle(key, "", 0, 20, 0);
 				}
 			}, introAnimation.get(key));
 		}
 		
-		
-		
+		Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(Main.plugin, new Runnable() {
+			@Override
+			public void run() {
+				plr.setState(PlayerState.States.DUELING);
+			}
+		}, 60);
 	}
 	
-	public void duelLeave(Player simp) { // ends a player's time to duel (does NOT remove them from the DuelClass instance, and will not be able to rejoin OR enter a new duel until the old one is over)
+	public void duelLeave(OfflinePlayer simp) { // ends a player's time to duel (does NOT remove them from the DuelClass instance, and will not be able to rejoin OR enter a new duel until the old one is over)
 		
-		DuelClass duel = this;
-		simp.setHealth(20.0);
-		//SaveData.loadPlayer(simp);
-		duel.findStateInDuel(simp).setState(PlayerState.States.KILLED);
+		if (simp instanceof Player) {
+			((Player) simp).setHealth(20.0);
+			this.findStateInDuel((Player) simp).setState(PlayerState.States.KILLED);
+		}
 		
 		ArrayList<PlayerState> HELLOGAMERS = new ArrayList<>();
-		for (PlayerState planar : duel.getPlayers()) {
-			if (planar.getState() != PlayerState.States.KILLED) {
-				
-				
+		for (PlayerState planar : this.getPlayers()) {
+			if (planar.getState() == PlayerState.States.DUELING || planar.getState() == PlayerState.States.JOINING) {
 				HELLOGAMERS.add(planar);
 			}
 		}
@@ -222,23 +197,27 @@ public class DuelClass {
 			Winner.setHealth(20.0);
 			//SaveData.loadPlayer(Winner); // loads inventory and saves scores
 			SaveData.Scoreboard(Winner);
-			
 			Bukkit.broadcastMessage(Winner.getDisplayName() + " §6 has won the §cDuel!!");
+			this.setState(States.TIMEOUT);
 			
-			duel.setState(States.TIMEOUT);
 			
+			DuelClass duel = this;
 			Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(Main.plugin, new Runnable() {
+				
 	            
 	            @Override
-	            public void run()
-	            {
-	            	instances.remove(duel);
+	            public void run() {
 	            	
-	            	for (PlayerState gaymerASMR : Players) {
-	            		gaymerASMR.remove();
-	            	}
+	            	
+	    			for (PlayerState planar : Players) {
+	        			planar.duelNull();
+	        			planar.setState(PlayerState.States.INGAME);
+	        			
+	        			
+	        		}
+	    			instances.remove(duel);
 	            }
-	        }, 200);
+	        }, 200); // 10 seconds
 		}
 	}
 	

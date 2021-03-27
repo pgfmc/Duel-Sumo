@@ -3,13 +3,15 @@ package net.pgfmc.duel.events;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 
 public class PlayerState {
 	
-	private final Player player;
+	private final OfflinePlayer player;
 	
 	public enum States {
+		INGAME,
 		PENDING,
 		JOINING,
 		DUELING,
@@ -26,10 +28,10 @@ public class PlayerState {
 		return(playerState);
 	}
 	
-	public PlayerState(Player player1) { // constructor
+	public PlayerState(Player player1) { // ------------------------------------------ constructor
 		
 		player = player1;
-		playerState = States.PENDING;
+		playerState = States.INGAME;
 		playerStates.add(this);
 		parentDuel = null;
 	}
@@ -39,7 +41,7 @@ public class PlayerState {
 	}
 
 	public Player getPlayer() { // returns the associated player
-		return player;
+		return (Player) player;
 	}
 	
 	public void remove() { // ------- deletes a player from existence (lol)
@@ -57,6 +59,10 @@ public class PlayerState {
 	
 	public void setDuel(DuelClass duelClass) {
 		parentDuel = duelClass;
+	}
+	
+	public void duelNull() {
+		parentDuel = null;
 	}
 	
 	public DuelClass getDuel() {
