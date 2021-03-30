@@ -7,6 +7,7 @@ import java.util.Set;
 
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 
@@ -14,10 +15,6 @@ import net.pgfmc.duel.Main;
 import net.pgfmc.duel.SaveData;
 
 public class DuelClass {
-	
-	
-	
-	
 	
 	private Player provoker;
 	
@@ -191,6 +188,8 @@ public class DuelClass {
 		}
 		
 		if (HELLOGAMERS.size() == 1) { // if there is only one person left alive
+			
+			simp.getPlayer().getWorld().playSound(simp.getPlayer().getLocation(), Sound.ENTITY_WITHER_HURT, 10, 10); // plays a death sound
 			
 			Player Winner = HELLOGAMERS.get(0).getPlayer();
 			

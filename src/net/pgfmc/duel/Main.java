@@ -1,5 +1,8 @@
 package net.pgfmc.duel;
 
+import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
+
 //import java.io.IOException;
 
 // Written by CrimsonDart
@@ -9,12 +12,11 @@ import org.bukkit.plugin.java.JavaPlugin;
 import net.pgfmc.duel.commands.CommandGetLosses;
 import net.pgfmc.duel.commands.CommandGetWins;
 import net.pgfmc.duel.events.PlayerEvents;
+import net.pgfmc.duel.events.PlayerState;
 
 public class Main extends JavaPlugin {
 	
 	public static Main plugin;
-	
-	public static boolean debugMode;
 	
 	public void onEnable() {
 		getCommand("Wins").setExecutor(new CommandGetWins());
@@ -25,15 +27,9 @@ public class Main extends JavaPlugin {
 		
 		plugin = this;
 		
-		debugMode = false;
-	}
-	
-	public static void setDebug(boolean JPmomnet) {
-		debugMode = JPmomnet;
-	}
-	
-	public static boolean getDebug() {
-		return debugMode;
+		for (Player player : Bukkit.getOnlinePlayers()) { // creates new playerstates for everyone on the server (for reloading plugins)
+			new PlayerState(player);
+		}
 	}
 }
 

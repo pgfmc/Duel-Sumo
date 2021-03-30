@@ -72,7 +72,7 @@ public class PlayerEvents implements Listener {
 							e.setCancelled(false);
 							return;
 	
-						} else if (DEF.getState() == States.REQUESTPENDING && DEF.getPlayers().contains(Reciever) && Sender.getState() == PlayerState.States.PENDING && Reciever.getState() == PlayerState.States.PENDING && attacker != DEF.getProvoker()) {
+						} else if (DEF.getState() == States.REQUESTPENDING && DEF.getPlayers().contains(Reciever) && Sender.getState() == PlayerState.States.PENDING && Reciever.getState() == PlayerState.States.PENDING && attacker != DEF.getProvoker() && isHoldingSword(attacker)) {
 							DEF.duelAccept();
 							return;
 						}
@@ -97,7 +97,7 @@ public class PlayerEvents implements Listener {
 			if (BlakeIsBest != null) {
 				if ((BlakeIsBest.getState() == States.BATTLEPENDING ||  BlakeIsBest.getState() == States.INBATTLE) && gamer.getGameMode() == GameMode.SURVIVAL) {
 					
-					if (e.getFinalDamage() >= gamer.getHealth()) {
+					if (e.getFinalDamage() >= gamer.getHealth()) { // if they would die on the next hit
 						
 						e.setCancelled(true);
 						
